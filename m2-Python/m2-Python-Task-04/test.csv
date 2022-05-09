@@ -1,5 +1,5 @@
 MAC address, Hostname, IPv4 (null), IPv6 (null), netmask (xxx.xxx.xxx.xxx or xx (CIDR)), user login (in epam format), full user name, email, ssh private key, ssh public key, description host, list is installed app, UUID
-E0-9D-31-1D-7E-0C,ROCCA-NB,192.168.43.172,fe80::51a4:a4d3:5b4f:714f%23,255.255.255.0,y.pelykh,Yurii Pelykh,yuriypelykh@gmail.com,SSH-key_private,SSH-key_public,WTF,Chrome PyCharm,550e8400-e29b-41d4-a716-446655440000
+E0-9D-31-1D-7E-0C,ROCCA-NB,192.168.43.173,fe80::51a4:a4d3:5b4f:714f%23,255.255.255.0,y.pelykh,Yurii Pelykh,yuriypelykh@gmail.com,SSH-key_private,SSH-key_public,WTF,Chrome PyCharm,550e8400-e29b-41d4-a716-446655440000
 A0-9A-32-1A-7E-DD,ROCCA-PC,192.168.43.174,fe80::51a4:a4d3:5b4f:714f%24,255.255.255.0,y.pelykh,Yurii Pelykh,yuriypelykh@gmail.com,SSH-key_private,"-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEA+xGZ/wcz9ugFpP07Nspo6U17l0YhFiFpxxU4pTk3Lifz9R3zsIsu
 ERwta7+fWIfxOo208ett/jhskiVodSEt3QBGh4XBipyWopKwZ93HHaDVZAALi/2A

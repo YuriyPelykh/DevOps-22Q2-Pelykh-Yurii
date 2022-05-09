@@ -74,14 +74,26 @@ def get_dict(path, delimiter, quote_char, header) -> dict:
     :return: csv_dict
     """
     csv_dict = {}
-    with open(path, 'rt') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=delimiter, quotechar=quote_char)
+    # with open(path, 'rt') as csv_file:
+    #     csv_reader = csv.reader(csv_file, delimiter=delimiter, quotechar=quote_char)
+    #     if header:
+    #         next(csv_reader, None)
+    #     i = int(header)
+    #     for row in csv_reader:
+    #         csv_dict.update({i: row})
+    #         i += 1
+
+    with open(path, newline='') as csvfile:
+        dialect = csv.Sniffer().sniff(csvfile.read(1024))
+        csvfile.seek(0)
+        csv_reader = csv.reader(csvfile, dialect)
         if header:
             next(csv_reader, None)
         i = int(header)
         for row in csv_reader:
             csv_dict.update({i: row})
             i += 1
+
     return csv_dict
 
 
@@ -199,10 +211,17 @@ def print_to_console(csv_dict) -> None:
 
 
 def print_pretty_table(csv_dict, cell_sep=' | ', header_separator=True):
+    """
+    Prints filtering result to console
+    :param csv_dict:
+    :param cell_sep:
+    :param header_separator:
+    :return:
+    """
     data = []
     for line in csv_dict.values():
         data += [line]
-    
+
     rows = len(data)
     cols = len(data[0])
 
@@ -255,7 +274,7 @@ def filter_csv(column, delimiter, quotechar, input_file, json_format, line,
         save_to_file(filtered, output, json_format, o_delimiter, o_quote_char)
     else:
         #print_to_console(filtered)
-        print_pretty_table(filtered)
+        print_pretty_table(filtered, header_separator=not header)
         #print(filtered)
 
 
