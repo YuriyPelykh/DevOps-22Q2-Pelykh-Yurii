@@ -218,6 +218,31 @@ def print_pretty_table(csv_dict, cell_sep=' | ', header_separator=True):
     :param header_separator:
     :return:
     """
+    # data = []
+    # for line in csv_dict.values():
+    #     data += [line]
+    #
+    # rows = len(data)
+    # cols = len(data[0])
+    #
+    # col_width = []
+    # for col in range(cols):
+    #     columns = [data[row][col] for row in range(rows)]
+    #     col_width.append(len(max(columns, key=len)))
+    #
+    # separator = "-+-".join('-' * n for n in col_width)
+    #
+    # for i, row in enumerate(range(rows)):
+    #     if i == 1 and header_separator:
+    #         print(separator)
+    #
+    #     result = []
+    #     for col in range(cols):
+    #         item = data[row][col].rjust(col_width[col])
+    #         result.append(item)
+    #
+    #     print(cell_sep.join(result))
+
     data = []
     for line in csv_dict.values():
         data += [line]
@@ -227,8 +252,13 @@ def print_pretty_table(csv_dict, cell_sep=' | ', header_separator=True):
 
     col_width = []
     for col in range(cols):
-        columns = [data[row][col] for row in range(rows)]
-        col_width.append(len(max(columns, key=len)))
+        max_line = int()
+        for row in range(rows):
+            lines = data[row][col].strip().split('\r\n')
+            if len(max(lines, key=len)) > max_line:
+                max_line = len(max(lines, key=len))
+        col_width.append(max_line)
+    print(col_width)
 
     separator = "-+-".join('-' * n for n in col_width)
 
