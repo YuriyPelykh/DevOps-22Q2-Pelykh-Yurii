@@ -255,10 +255,18 @@ def print_pretty_table(csv_dict, cell_sep=' | ', header_separator=True):
         max_line = int()
         for row in range(rows):
             lines = data[row][col].strip().split('\r\n')
+
             if len(max(lines, key=len)) > max_line:
                 max_line = len(max(lines, key=len))
         col_width.append(max_line)
-    print(col_width)
+
+    multiline_size = []
+    for row in range(rows):
+        max_count = int()
+        for col in range(cols):
+            if len(data[row][col].strip().split('\r\n')) > max_count:
+                max_count = len(data[row][col].strip().split('\r\n'))
+        multiline_size.append(max_count)
 
     separator = "-+-".join('-' * n for n in col_width)
 
@@ -268,8 +276,12 @@ def print_pretty_table(csv_dict, cell_sep=' | ', header_separator=True):
 
         result = []
         for col in range(cols):
-            item = data[row][col].rjust(col_width[col])
-            result.append(item)
+            for nl in range(multiline_size[row]):
+                if len(data[row][col].strip().split('\r\n')) < multiline_size[row]:
+                    item = ''.rjust(col_width[col])
+                else:
+                    item = data[row][col].strip().split('\r\n')[nl].rjust(col_width[col])
+                result.append(item)
 
         print(cell_sep.join(result))
 
