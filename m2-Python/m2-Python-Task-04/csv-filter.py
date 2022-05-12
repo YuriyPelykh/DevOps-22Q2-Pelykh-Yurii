@@ -18,7 +18,7 @@ def parse_arguments() -> dict:
     args_parser.add_argument('-c', '--column',
                              type=str,
                              help='Filtering by column number. Use exact column numbers or ranges.'
-                                  ' Example: 1,4,67-93,110')
+                                  ' Example: -c 1,4,67-93,110')
     args_parser.add_argument('-d', '--delimiter',
                              type=str,
                              help='A one-character string used to separate fields. It defaults to ","')
@@ -26,22 +26,22 @@ def parse_arguments() -> dict:
                              type=str,
                              help='A one-character string used to quote fields containing special'
                                   ' characters, such as the delimiter or quotechar, or which contain'
-                                  ' new-line characters. Example: \'\\\"\'.')
+                                  ' new-line characters. Example: -q \'\\\"\'.')
     args_parser.add_argument('-i', '--input',
                              type=str,
                              help='The path to CSV file to be filtered')
     args_parser.add_argument('-j', '--json',
                              action='count',
                              default=0,
-                             help='Convert CSV to JSON format')
+                             help='Output to the file in a JSON format')
     args_parser.add_argument('-l', '--line',
                              type=str,
                              help='Filtering by line number. Use exact line numbers or ranges.'
-                                  ' Example: 1,4,67-93,110')
+                                  ' Example: -l 1,4,67-93,110')
     args_parser.add_argument('-o', '--output',
                              type=str,
-                             help='Output flag. To console by default, into a file is optional'
-                                  '(requires the path to output file)')
+                             help='Key of output to the file. Requires a path to output file. '
+                                  'If not specified, output performs to the standard output stream')
     args_parser.add_argument('-od', '--odelimiter',
                              type=str,
                              help='A one-character string used to separate fields in output file.'
@@ -55,16 +55,16 @@ def parse_arguments() -> dict:
                              type=str,
                              help='Search by regex. See https://docs.python.org/3/library/re.html'
                                   ' for regular expressions syntax. Example:'
-                                  ' -r \'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\'')
+                                  ' -r \'\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\'')
     args_parser.add_argument('-separator', '--separator',
                              action='count',
                              default=0,
-                             help='Separator between lines in console output. Prints by default.'
-                                  ' Add "-separator" or "--separator" to remove it.')
+                             help='Separator between lines in console output. Printed by default.'
+                                  ' Add "-separator" or "--separator" key to remove separator.')
     args_parser.add_argument('-header', '--header',
                              action='count',
                              default=0,
-                             help='Flag of header line. Header line included by default in output result.'
+                             help='Key of header line. Header line included by default in output result.'
                                   ' Add "-header" or "--header" to exclude it.')
     return vars(args_parser.parse_args())
 
@@ -79,10 +79,8 @@ def get_dict(path, delimiter, quote_char, header) -> dict:
     :return: csv_dict
     """
     csv_dict = {}
-    if delimiter or quote_char:
+    if delimiter and quote_char:
         with open(path, 'rt', newline='') as csv_file:
-            print('Delimiter: ', delimiter)
-            print('Quotechar: ', quote_char)
             csv_reader = csv.reader(csv_file, delimiter=delimiter, quotechar=quote_char)
             if header:
                 next(csv_reader, None)
@@ -90,6 +88,10 @@ def get_dict(path, delimiter, quote_char, header) -> dict:
             for row in csv_reader:
                 csv_dict.update({i: row})
                 i += 1
+    elif delimiter or quote_char:
+        print('Delimiter and quotechar required to be specified.'
+              ' Or don\'t enter any to define them automatically')
+        exit(-1)
     else:
         with open(path, newline='') as csvfile:
             dialect = csv.Sniffer().sniff(csvfile.read(1024))
