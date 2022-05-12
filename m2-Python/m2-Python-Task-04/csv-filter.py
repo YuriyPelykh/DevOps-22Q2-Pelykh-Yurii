@@ -26,7 +26,7 @@ def parse_arguments() -> dict:
                              type=str,
                              help='A one-character string used to quote fields containing special'
                                   ' characters, such as the delimiter or quotechar, or which contain'
-                                  ' new-line characters. It defaults to ".')
+                                  ' new-line characters. Example: \'\\\"\'.')
     args_parser.add_argument('-i', '--input',
                              type=str,
                              help='The path to CSV file to be filtered')
@@ -50,12 +50,17 @@ def parse_arguments() -> dict:
                              type=str,
                              help='A one-character string for output file used to quote fields'
                                   ' containing special characters, such as the delimiter or quotechar,'
-                                  ' or which contain new-line characters. It defaults to \'"\'.')
+                                  ' or which contain new-line characters. It defaults to \'\\\"\'.')
     args_parser.add_argument('-r', '--regex',
                              type=str,
                              help='Search by regex. See https://docs.python.org/3/library/re.html'
                                   ' for regular expressions syntax. Example:'
                                   ' -r \'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\'')
+    args_parser.add_argument('-separator', '--separator',
+                             action='count',
+                             default=0,
+                             help='Separator between lines in console output. Prints by default.'
+                                  ' Add "-separator" or "--separator" to remove it.')
     args_parser.add_argument('-header', '--header',
                              action='count',
                              default=0,
@@ -74,25 +79,28 @@ def get_dict(path, delimiter, quote_char, header) -> dict:
     :return: csv_dict
     """
     csv_dict = {}
-    # with open(path, 'rt') as csv_file:
-    #     csv_reader = csv.reader(csv_file, delimiter=delimiter, quotechar=quote_char)
-    #     if header:
-    #         next(csv_reader, None)
-    #     i = int(header)
-    #     for row in csv_reader:
-    #         csv_dict.update({i: row})
-    #         i += 1
-
-    with open(path, newline='') as csvfile:
-        dialect = csv.Sniffer().sniff(csvfile.read(1024))
-        csvfile.seek(0)
-        csv_reader = csv.reader(csvfile, dialect)
-        if header:
-            next(csv_reader, None)
-        i = int(header)
-        for row in csv_reader:
-            csv_dict.update({i: row})
-            i += 1
+    if delimiter or quote_char:
+        with open(path, 'rt', newline='') as csv_file:
+            print('Delimiter: ', delimiter)
+            print('Quotechar: ', quote_char)
+            csv_reader = csv.reader(csv_file, delimiter=delimiter, quotechar=quote_char)
+            if header:
+                next(csv_reader, None)
+            i = int(header)
+            for row in csv_reader:
+                csv_dict.update({i: row})
+                i += 1
+    else:
+        with open(path, newline='') as csvfile:
+            dialect = csv.Sniffer().sniff(csvfile.read(1024))
+            csvfile.seek(0)
+            csv_reader = csv.reader(csvfile, dialect)
+            if header:
+                next(csv_reader, None)
+            i = int(header)
+            for row in csv_reader:
+                csv_dict.update({i: row})
+                i += 1
 
     return csv_dict
 
@@ -125,6 +133,8 @@ def filter_lines(csv_dict, lines_ranges, header) -> dict:
     :return: dictionary with a filtered lines
     """
     filtered = {}
+    if not header:
+        filtered.update({0: csv_dict[0]})
     for key, value in lines_ranges.items():
         filtered.update(dict(list(csv_dict.items())[int(key) - int(header):
                                                     int(value) - int(header) + 1]))
@@ -186,62 +196,17 @@ def save_to_file(csv_dict, path, json_format, o_delimiter, o_quote_char) -> None
             json_file.write(json.dumps(csv_dict, indent=4))
 
 
-def print_to_console(csv_dict) -> None:
+def print_pretty_table(csv_dict, line_separator, cell_sep=' | '):
     """
     Prints filtering result to console
-    :param json:
-    :param csv_dict:
-    :return:
-    """
-    #template = ''
-    # width = {}
-    # for line in csv_dict.values():
-    #     c = 0
-    #     for column in line:
-    #         print column
-    #         width.update({c: len(column)})
-    #         c += 1
-
-    # for line in csv_dict.values():
-    #     template = ''
-    #     for i in len(line):
-    #         template += f'{line[{i}]:}   '
-    #     print(f'{line[0]:}   {line[1]:}')
-    pass
-
-
-def print_pretty_table(csv_dict, cell_sep=' | ', header_separator=True):
-    """
-    Prints filtering result to console
+    :param line_separator:
     :param csv_dict:
     :param cell_sep:
-    :param header_separator:
     :return:
     """
-    # data = []
-    # for line in csv_dict.values():
-    #     data += [line]
-    #
-    # rows = len(data)
-    # cols = len(data[0])
-    #
-    # col_width = []
-    # for col in range(cols):
-    #     columns = [data[row][col] for row in range(rows)]
-    #     col_width.append(len(max(columns, key=len)))
-    #
-    # separator = "-+-".join('-' * n for n in col_width)
-    #
-    # for i, row in enumerate(range(rows)):
-    #     if i == 1 and header_separator:
-    #         print(separator)
-    #
-    #     result = []
-    #     for col in range(cols):
-    #         item = data[row][col].rjust(col_width[col])
-    #         result.append(item)
-    #
-    #     print(cell_sep.join(result))
+    if len(csv_dict) == 0:
+        print('Not found')
+        exit(-1)
 
     data = []
     for line in csv_dict.values():
@@ -255,7 +220,6 @@ def print_pretty_table(csv_dict, cell_sep=' | ', header_separator=True):
         max_line = int()
         for row in range(rows):
             lines = data[row][col].strip().split('\r\n')
-
             if len(max(lines, key=len)) > max_line:
                 max_line = len(max(lines, key=len))
         col_width.append(max_line)
@@ -271,25 +235,25 @@ def print_pretty_table(csv_dict, cell_sep=' | ', header_separator=True):
     separator = "-+-".join('-' * n for n in col_width)
 
     for i, row in enumerate(range(rows)):
-        if i == 1 and header_separator:
-            print(separator)
-
-        result = []
-        for col in range(cols):
-            for nl in range(multiline_size[row]):
-                if len(data[row][col].strip().split('\r\n')) < multiline_size[row]:
-                    item = ''.rjust(col_width[col])
-                else:
-                    item = data[row][col].strip().split('\r\n')[nl].rjust(col_width[col])
+        # if i == 1 and line_separator:
+        #     print(separator)
+        for line in range(multiline_size[row]):
+            result = []
+            for col in range(cols):
+                item = ''.rjust(col_width[col])
+                if len(data[row][col].strip().split('\r\n')) >= line+1:
+                    item = data[row][col].strip().split('\r\n')[line].ljust(col_width[col])
                 result.append(item)
-
-        print(cell_sep.join(result))
+            print(cell_sep.join(result))
+        if line_separator:
+            print(separator)
 
 
 def filter_csv(column, delimiter, quotechar, input_file, json_format, line,
-               output, o_delimiter, o_quote_char, regex, header) -> None:
+               output, o_delimiter, o_quote_char, regex, separator, header) -> None:
     """
     Script's main logic
+    :param separator:
     :param json_format:
     :param column:
     :param delimiter:
@@ -315,9 +279,7 @@ def filter_csv(column, delimiter, quotechar, input_file, json_format, line,
     if output:
         save_to_file(filtered, output, json_format, o_delimiter, o_quote_char)
     else:
-        #print_to_console(filtered)
-        print_pretty_table(filtered, header_separator=not header)
-        #print(filtered)
+        print_pretty_table(filtered, line_separator=not separator)
 
 
 def main():
@@ -327,13 +289,14 @@ def main():
     args = parse_arguments()
 
     filter_csv(column=args['column'],
-               delimiter=args['delimiter'] if args['delimiter'] else ',',
-               quotechar=args['quotechar'] if args['quotechar'] else '"',
+               delimiter=args['delimiter'],
+               quotechar=args['quotechar'],
                input_file=args['input'], json_format=args['json'],
                line=args['line'], output=args['output'],
                o_delimiter=args['odelimiter'] if args['odelimiter'] else ',',
                o_quote_char=args['oquotechar'] if args['oquotechar'] else '"',
-               regex=args['regex'], header=args['header'])
+               regex=args['regex'], separator=args['separator'],
+               header=args['header'])
 
 
 if __name__ == '__main__':
