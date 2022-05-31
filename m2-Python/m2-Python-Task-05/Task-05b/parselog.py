@@ -1,6 +1,6 @@
 #!/usr/bin/env/python3.10
 
-"""Task-05b"""
+"""Task-05b Apache's Log Parser"""
 
 from parseargs import ScriptArgs
 import collections
@@ -10,6 +10,15 @@ import datetime
 
 
 def grep_log(log_file, pattern=None, return_match=None) -> list:
+    """
+    Make looking for 'pattern' in 'log_file'. If 'return match'
+    is True, then function returns exact matches only, else whole
+    lines where matches found.
+    :param log_file:
+    :param pattern:
+    :param return_match:
+    :return:
+    """
     grepped_list = []
     while True:
         line = log_file.readline()
@@ -25,6 +34,12 @@ def grep_log(log_file, pattern=None, return_match=None) -> list:
 
 
 def top_n_from_list(found_list, count, sort_by_name=False) -> dict:
+    """
+    :param found_list:
+    :param count:
+    :param sort_by_name:
+    :return: dictionary with 'count' of most frequently repeated items from 'found_list'
+    """
     counts = collections.Counter(found_list)
     sorted_list = sorted(found_list, key=counts.get if not sort_by_name else None,
                          reverse=True if not sort_by_name else False)
@@ -38,6 +53,12 @@ def top_n_from_list(found_list, count, sort_by_name=False) -> dict:
 
 
 def top_long_from_list(found_list, count, long) -> dict:
+    """
+    :param found_list:
+    :param count:
+    :param long:
+    :return: dictionary with 'count' most long or short items from 'found_list'
+    """
     sorted_list = sorted(found_list, key=len, reverse=long)
     req_dict = dict()
     for each in sorted_list:
@@ -46,6 +67,11 @@ def top_long_from_list(found_list, count, long) -> dict:
 
 
 def cut_requests(input_list, k) -> list:
+    """
+    :param input_list:
+    :param k:
+    :return: list of cutted requests from 'input_list' till k-th slash
+    """
     output_list = []
     for each in input_list:
         temp = [x.start() for x in re.finditer('/', each)]
@@ -55,6 +81,13 @@ def cut_requests(input_list, k) -> list:
 
 
 def time_distribution(log_file, time, entity_list=None) -> dict:
+    """
+    :param log_file:
+    :param time:
+    :param entity_list:
+    :return: a dictionary with distribution of requests (or items specified in 'entity_list')
+    per 'time' intervals in seconds.
+    """
     time_dict = dict()
     unix_list = list()
     # Looking for log's start-time and end-time:
@@ -102,11 +135,28 @@ def time_distribution(log_file, time, entity_list=None) -> dict:
 
 
 def print_result(result_dict: dict) -> None:
+    """
+    :param result_dict:
+    :return: None. Prints dictionary to screen.
+    """
     for key, value in result_dict.items():
         print(key, '=>', value)
 
 
 def main(file, task, count, time, worker, long, short, k, sort_by_name) -> None:
+    """
+    Main function describes a general logic of a script depending on transferred arguments
+    :param file:
+    :param task:
+    :param count:
+    :param time:
+    :param worker:
+    :param long:
+    :param short:
+    :param k:
+    :param sort_by_name:
+    :return: None
+    """
     log_file = open(file, 'rt')
     result = dict()
     if task == 1:
