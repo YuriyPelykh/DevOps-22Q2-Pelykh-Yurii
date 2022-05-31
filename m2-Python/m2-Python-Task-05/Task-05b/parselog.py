@@ -9,9 +9,25 @@ import re
 import datetime
 
 
-def top_n_from_list(found_list, count) -> dict:
+def grep_log(log_file, pattern=None, return_match=None) -> list:
+    grepped_list = []
+    while True:
+        line = log_file.readline()
+        if not line:
+            break
+        found = re.search(pattern, line)
+        if found:
+            grepped_list.append(line if not return_match else found.group())
+        else:
+            continue
+    log_file.seek(0)
+    return grepped_list
+
+
+def top_n_from_list(found_list, count, sort_by_name=False) -> dict:
     counts = collections.Counter(found_list)
-    sorted_list = sorted(found_list, key=counts.get, reverse=True)
+    sorted_list = sorted(found_list, key=counts.get if not sort_by_name else None,
+                         reverse=True if not sort_by_name else False)
     ip_dict = dict()
     for each in sorted_list:
         if each in ip_dict.keys():
@@ -21,72 +37,68 @@ def top_n_from_list(found_list, count) -> dict:
     return {n: ip_dict[n] for n in list(ip_dict)[:count]}
 
 
-def most_freq_browse_ips(file, count) -> dict:
-    log_file = open(file, 'rt')
-    found_list = []
-    while True:
-        line = log_file.readline()
-        if not line:
-            break
-        #search by pattern: (xxx.xxx.xxx.xxx|unknown, xxx.xxx.xxx.xxx|unknown, ...)
-        found = re.search(r'\(((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|unknown)(, )?)+\)', line)
-        if found:
-            #1-st IP is client's IP, others - are proxies
-            found_list.append(found.group().strip('()').split(', ')[0])
-        else:
-            continue
-    log_file.close()
-    return top_n_from_list(found_list, count)
+def top_long_from_list(found_list, count, long) -> dict:
+    sorted_list = sorted(found_list, key=len, reverse=long)
+    req_dict = dict()
+    for each in sorted_list:
+        req_dict.update({each: len(each)})
+    return {n: req_dict[n] for n in list(req_dict)[:count]}
 
 
-def request_freq(file, time) -> dict:
-    log_file = open(file, 'rt')
+def cut_requests(input_list, k) -> list:
+    output_list = []
+    for each in input_list:
+        temp = [x.start() for x in re.finditer('/', each)]
+        result = each[0:temp[k - 1] if len(temp)>=k else temp[len(temp)-1]]
+        output_list.append(result)
+    return output_list
+
+
+def time_distribution(log_file, time, entity_list=None) -> dict:
     time_dict = dict()
     unix_list = list()
-
+    # Looking for log's start-time and end-time:
     while True:
         line = log_file.readline()
         if not line:
             break
-        # [08/Oct/2015:09:01:42 +0000]
+        # Looking for pattern [08/Oct/2015:09:01:42 +0000]
         time_mark = re.search(r'[0-9]{2}/[A-Za-z]{3}/[0-9]{4}(:[0-9]{2}){3}', line)
         if time_mark:
             date_format = datetime.datetime.strptime(time_mark.group(), "%m/%b/%Y:%H:%M:%S")
             unix_time = datetime.datetime.timestamp(date_format)
             unix_list.append(unix_time)
-
-            #print(unix_time - ((unix_time+0)%time+30))
-            time_slot = unix_time-(unix_time+0)%time
-            #print(time_slot)
-            slot_read = datetime.datetime.fromtimestamp(time_slot)
-            time_dict.update({slot_read:time_dict[slot_read]+1
-                             if time_dict.get(slot_read)
-                             else 1})
         else:
             continue
-    log_file.close()
-    sorted_list = sorted(unix_list)
-    print(sorted_list[:10])
-    print(datetime.datetime.fromtimestamp(sorted_list[0]), datetime.datetime.fromtimestamp(sorted_list[1]),
-          datetime.datetime.fromtimestamp(sorted_list[2]), datetime.datetime.fromtimestamp(sorted_list[4]))
+    unix_list = sorted(unix_list)
+    start_time = unix_list[0]
+    end_time = unix_list[-1]
+    # Fill all time-slots in distribution with 0:
+    for k in range(0,int((end_time-start_time)/time)+1):
+        time_dict.update({datetime.datetime.fromtimestamp(start_time+k*time):0})
+    # If distribution parameter is not set. Distribution of all records in log:
+    if not entity_list:
+        for each in unix_list:
+            if each % start_time >= time:
+                start_time += time
+            time_dict.update({datetime.datetime.fromtimestamp(start_time):
+                                  time_dict[datetime.datetime.fromtimestamp(start_time)] + 1
+                                  if time_dict.get(datetime.datetime.fromtimestamp(start_time))
+                                  else 1})
+    # When distribution parameter was set (by 50X errors or by workers or by anything else):
+    else:
+        for each in entity_list:
+            time_mark = re.search(r'[0-9]{2}/[A-Za-z]{3}/[0-9]{4}(:[0-9]{2}){3}', each)
+            if time_mark:
+                date_format = datetime.datetime.strptime(time_mark.group(), "%m/%b/%Y:%H:%M:%S")
+                unix_time = datetime.datetime.timestamp(date_format)
+                for key, value in time_dict.items():
+                    unix_in_dict = datetime.datetime.timestamp(key)
+                    if unix_time%unix_in_dict < time:
+                        time_dict.update({key:value+1})
+            else:
+                continue
     return time_dict
-
-
-def most_freq_user_agents(file, count) -> dict:
-    log_file = open(file, 'rt')
-    found_list = []
-    while True:
-        line = log_file.readline()
-        if not line:
-            break
-        #search by pattern: "Xxxxx/0.0 ..."
-        found = re.search(r'"\w+/[0-9]+\..+"', line)
-        if found:
-            found_list.append(found.group())
-        else:
-            continue
-    log_file.close()
-    return top_n_from_list(found_list, count)
 
 
 def print_result(result_dict: dict) -> None:
@@ -94,26 +106,73 @@ def print_result(result_dict: dict) -> None:
         print(key, '=>', value)
 
 
-def main(file, task, count, time) -> None:
+def main(file, task, count, time, worker, long, short, k, sort_by_name) -> None:
+    log_file = open(file, 'rt')
+    result = dict()
     if task == 1:
-        print('Browser IPs, which meet most frequently:\n', most_freq_browse_ips(file, count))
+        pattern = r'\(((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|unknown)(, )?)+\)'
+        grepped_ips = grep_log(log_file,pattern,return_match=True)
+        browser_ips = []
+        for each in grepped_ips: browser_ips.append(each.strip('()').split(', ')[0])
+        result = top_n_from_list(browser_ips, count)
+        print('Browser IP(s), which meet most frequently:')
     elif task == 2:
-        print(f'Requests per {time} seconds intervals:\n')
-        print_result(request_freq(file, time))
+        result = time_distribution(log_file,time)
+        print(f'Requests count per {time}-seconds interval(s):')
     elif task == 3:
-        print('Most frequent User-Agents:\n', most_freq_user_agents(file, count))
+        pattern = r'"\w+/[0-9]+\..+?"'
+        grepped_UA_list = grep_log(log_file, pattern, return_match=True)
+        result = top_n_from_list(grepped_UA_list, count)
+        print('Most frequent User-Agent(s):')
     elif task == 4:
-        print('Most frequent User-Agents:\n', most_freq_user_agents(file, count))
-    elif task == 5:
-        pass
-    elif task == 6:
-        pass
+        pattern = r'50[0-9] (([0-9]{1,8}|-) ){3}'
+        greped_errors = grep_log(log_file, pattern)
+        result = time_distribution(log_file, time, greped_errors)
+        print(f'50X-errors count per {time}-seconds interval(s):')
+    elif task == 5 or task == 6:
+        pattern = r'"[A-Z]{3,7} .+ HTTP/[0-9]\.[0-9]"'
+        grepped_req = grep_log(log_file, pattern, return_match=True)
+        clear_req = []
+        for each in grepped_req: clear_req.append(each.split()[1])
+        if task == 5:
+            result = top_long_from_list(clear_req, count, long if long or not short else False)
+            print(f'{count} most {"short" if short else "long"} request(s):\n[Request => count of symbols]')
+        else:
+            cutted_req = cut_requests(clear_req, k)
+            result = top_n_from_list(cutted_req, count)
+            print(f'{count} most frequent requests to {k} slash:')
     elif task == 7:
-        pass
+        pattern = r'"[a-z]{3}://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:[0-9]{2,5})?"'
+        workers_list = grep_log(log_file, pattern, return_match=True)
+        result = top_n_from_list(workers_list, len(workers_list))
+        print(f'Requests count per each worker:')
+    elif task == 8:
+        pattern = r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'
+        grepped_refs = grep_log(log_file,pattern,return_match=True)
+        result = top_n_from_list(grepped_refs, len(grepped_refs), sort_by_name)
+        print(f'Referer statistics:')
+    elif task == 9:
+        pattern = r'"[a-z]{3}://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:[0-9]{2,5})?"' if not worker else f'ajp://{worker}'
+        greped_workers = grep_log(log_file, pattern)
+        result = time_distribution(log_file, time, greped_workers)
+        print(f'Requests count to worker {worker} per {time}-seconds interval(s):')
+    elif task == 10:
+        requests = time_distribution(log_file, time)
+        most_load = top_n_from_list(requests, count)
+        result = dict()
+        for each in most_load.keys(): result.update({each:requests.get(each)})
+        print(f'Top {count} {time}-seconds time intervals with most number of requests:')
+    else:
+        print('Incorrect task number. Select from 1 to 10.')
+    print_result(result)
+    log_file.close()
 
 if __name__ == '__main__':
     args = ScriptArgs().get_args()
     main(file=args['file'], task = args['task'],
-         count=args['count'] if args['count'] else 1,
-         time=args['time'] if args['time'] else 60)
-
+         count=args['number'] if args['number'] else 1,
+         time=args['time'] if args['time'] else 60,
+         worker=args['worker'],long=args['long'],
+         short=args['short'],
+         k=args['kslash'] if args['kslash'] else 2,
+         sort_by_name=args['sortbyname'])
