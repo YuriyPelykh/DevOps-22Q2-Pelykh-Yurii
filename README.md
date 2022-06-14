@@ -13,4 +13,5 @@
 - [ ] [Task 4 - CSV (TSV, DSV) Parser](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m2-Python/m2-Python/m2-Python-Task-04)  
 - [ ] [Task 5 - Apache's Log Parser](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m2-Python/m2-Python/m2-Python-Task-05)  
 ### [Module 3 - Linux]()  
-- [ ] [Task 1 - In progress...]()  
+- [ ] [Task 1 - Pipes](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m3-Linux-Task-01/m3-Linux/m3-Linux-Task-01)  
+- [ ] [Task 2 - In progress...]()  
