@@ -1,0 +1,96 @@
+cffe48f (HEAD -> main, origin/main, origin/first, origin/develop, origin/HEAD, first, develop) HEAD@{0}: merge develop: Fast-forward
+4e582df (origin/styles2, styles2) HEAD@{1}: checkout: moving from develop to main
+cffe48f (HEAD -> main, origin/main, origin/first, origin/develop, origin/HEAD, first, develop) HEAD@{2}: merge first: Fast-forward
+ebdbe70 (origin/second, second) HEAD@{3}: checkout: moving from first to develop
+cffe48f (HEAD -> main, origin/main, origin/first, origin/develop, origin/HEAD, first, develop) HEAD@{4}: rebase -i (finish): returning to refs/heads/first
+cffe48f (HEAD -> main, origin/main, origin/first, origin/develop, origin/HEAD, first, develop) HEAD@{5}: rebase -i (squash): branch first C2+C3+C4, file{2,3}.txt add, file1.txt modified
+0fb35ef HEAD@{6}: rebase -i (squash): # This is a combination of 2 commits.
+f1f547e HEAD@{7}: rebase -i (pick): branch first, file2.txt add, file1.txt mod
+5b294c1 HEAD@{8}: rebase -i (pick): branch first, file1.txt add
+ebdbe70 (origin/second, second) HEAD@{9}: rebase -i (start): checkout develop
+c3b0183 HEAD@{10}: checkout: moving from develop to first
+ebdbe70 (origin/second, second) HEAD@{11}: merge second: Fast-forward
+c73decf HEAD@{12}: checkout: moving from second to develop
+ebdbe70 (origin/second, second) HEAD@{13}: rebase -i (finish): returning to refs/heads/second
+ebdbe70 (origin/second, second) HEAD@{14}: commit: branch second C3, second_file3.txt modified during rebase
+abbadda HEAD@{15}: reset: moving to HEAD^
+2002594 HEAD@{16}: rebase -i (edit): branch second C3, second_file3.txt created
+abbadda HEAD@{17}: commit: branch second C2b, second_file2.txt modified
+b9500dd HEAD@{18}: commit: branch second C2a, second_file1.txt modified
+3c91862 HEAD@{19}: reset: moving to HEAD^
+3e2581f HEAD@{20}: rebase -i (edit): branch second C2, secondfile[1,2].txt modified
+3c91862 HEAD@{21}: rebase -i (reword): branch second C1, second_file{1,2}.txt created
+3d81c43 HEAD@{22}: rebase -i (reword): branch second C1, secondfile[1,2].txt created
+c73decf HEAD@{23}: rebase -i (start): checkout develop
+553bf03 HEAD@{24}: reset: moving to HEAD@{16}
+0f74cfd HEAD@{25}: rebase -i (finish): returning to refs/heads/second
+0f74cfd HEAD@{26}: rebase -i (pick): branch second C3, second_file3.txt created
+df147c5 HEAD@{27}: commit: branch second C2b, second_file2.txt modified
+2d1f463 HEAD@{28}: commit: branch second C2a, second_file1.txt created
+47b41cc HEAD@{29}: reset: moving to HEAD^
+7b3787c HEAD@{30}: rebase -i (edit): branch second C2, secondfile[1,2].txt modified
+47b41cc HEAD@{31}: rebase -i (reword): branch second C1, second_file{1,2}.txt created
+00e61fa HEAD@{32}: rebase -i (reword): branch second C1, secondfile[1,2].txt created
+c73decf HEAD@{33}: rebase -i (start): checkout develop
+553bf03 HEAD@{34}: reset: moving to HEAD@{6}
+553bf03 HEAD@{35}: rebase -i (abort): updating HEAD
+10083a0 HEAD@{36}: rebase -i (edit): branch second C3, second_file3.txt created
+488245f HEAD@{37}: rebase -i (edit): branch second C2, secondfile[1,2].txt modified
+a25999e HEAD@{38}: rebase -i (reword): branch second C1, second_file{1,2}.txt created
+e894603 HEAD@{39}: rebase -i (reword): branch second C1, secondfile[1,2].txt created
+c73decf HEAD@{40}: rebase -i (start): checkout develop
+553bf03 HEAD@{41}: commit: branch second C3, second_file3.txt created
+065e74a HEAD@{42}: commit: branch second C2, secondfile[1,2].txt modified
+be62f42 HEAD@{43}: commit: branch second C1, secondfile[1,2].txt created
+cf86570 HEAD@{44}: checkout: moving from first to second
+c3b0183 HEAD@{45}: commit: branch first C5, file[1,2].txt mod
+bb54280 HEAD@{46}: commit: branch first C4, file[1,2,3].txt mod
+5a0c9c1 HEAD@{47}: commit: branch first C3, file3.txt add, file1,2.txt mod
+f8847d5 HEAD@{48}: commit: branch first, file2.txt add, file1.txt mod
+778360f HEAD@{49}: commit: branch first, file1.txt add
+cf86570 HEAD@{50}: checkout: moving from develop to first
+c73decf HEAD@{51}: commit: readme.txt mod, somefile.txt add
+cf86570 HEAD@{52}: commit: task2 init commit
+4e582df (origin/styles2, styles2) HEAD@{53}: checkout: moving from main to develop
+4e582df (origin/styles2, styles2) HEAD@{54}: merge develop: Fast-forward
+c4447cd HEAD@{55}: checkout: moving from develop to main
+4e582df (origin/styles2, styles2) HEAD@{56}: rebase finished: refs/heads/develop onto 4e582df36480b6137f8c4dc4c0b979660d088eb7
+4e582df (origin/styles2, styles2) HEAD@{57}: rebase: checkout styles2
+1a1ef5f (origin/images2, images2) HEAD@{58}: checkout: moving from styles2 to develop
+4e582df (origin/styles2, styles2) HEAD@{59}: rebase finished: returning to refs/heads/styles2
+4e582df (origin/styles2, styles2) HEAD@{60}: rebase: index.html modified in the styles2 branch
+8a4a1f5 HEAD@{61}: rebase: styles2 dir with css styles was added
+1a1ef5f (origin/images2, images2) HEAD@{62}: rebase: checkout develop
+56c4d63 HEAD@{63}: checkout: moving from develop to styles2
+1a1ef5f (origin/images2, images2) HEAD@{64}: rebase finished: refs/heads/develop onto 1a1ef5fa062fa1ebe47cf7ee6171c93decaf686f
+1a1ef5f (origin/images2, images2) HEAD@{65}: rebase: checkout images2
+c4447cd HEAD@{66}: checkout: moving from images2 to develop
+1a1ef5f (origin/images2, images2) HEAD@{67}: checkout: moving from develop to images2
+c4447cd HEAD@{68}: checkout: moving from styles2 to develop
+56c4d63 HEAD@{69}: commit: index.html modified in the styles2 branch
+b33ae14 HEAD@{70}: commit: styles2 dir with css styles was added
+c4447cd HEAD@{71}: checkout: moving from develop to styles2
+c4447cd HEAD@{72}: checkout: moving from images2 to develop
+1a1ef5f (origin/images2, images2) HEAD@{73}: commit: index.html modified in the images2 branch
+017de5c HEAD@{74}: commit: images2 dir with pictures added
+c4447cd HEAD@{75}: checkout: moving from develop to images2
+c4447cd HEAD@{76}: checkout: moving from main to develop
+c4447cd HEAD@{77}: merge develop: Fast-forward
+b115f39 HEAD@{78}: checkout: moving from develop to main
+c4447cd HEAD@{79}: commit (merge): conflict resolved, merge styles into develop finish
+25f9058 (origin/images, images) HEAD@{80}: merge images: Fast-forward
+e24decb HEAD@{81}: checkout: moving from styles to develop
+e81345a (origin/styles, styles) HEAD@{82}: commit: styles folder added, index.html modified
+e24decb HEAD@{83}: checkout: moving from develop to styles
+e24decb HEAD@{84}: checkout: moving from images to develop
+25f9058 (origin/images, images) HEAD@{85}: commit: index.html modified
+7046775 HEAD@{86}: commit: images added
+e24decb HEAD@{87}: checkout: moving from develop to images
+e24decb HEAD@{88}: commit: index.html added
+b115f39 HEAD@{89}: checkout: moving from main to develop
+b115f39 HEAD@{90}: checkout: moving from develop to main
+b115f39 HEAD@{91}: checkout: moving from main to develop
+b115f39 HEAD@{92}: commit: readme.txt added
+7633d41 HEAD@{93}: checkout: moving from m1-Git to main
+7633d41 HEAD@{94}: checkout: moving from main to m1-Git
+7633d41 HEAD@{95}: clone: from git@gitlab.com:YuriyPelykh/DevOps-22-Pelykh-Yurii.git
