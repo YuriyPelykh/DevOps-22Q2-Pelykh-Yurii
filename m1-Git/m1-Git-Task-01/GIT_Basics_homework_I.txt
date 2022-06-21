@@ -1,0 +1,44 @@
+Rocca@ROCCA-NB MINGW64 /d/Dev/DevOps/DevOps-22-Pelykh-Yurii (main)
+$ git reflog
+4e582df (HEAD -> main, origin/styles2, origin/main, origin/develop, origin/HEAD, styles2, develop) HEAD@{0}: merge develop: Fast-forward
+c4447cd HEAD@{1}: checkout: moving from develop to main
+4e582df (HEAD -> main, origin/styles2, origin/main, origin/develop, origin/HEAD, styles2, develop) HEAD@{2}: rebase finished: refs/heads/develop onto 4e582df36480b6137f8c4dc4c0b979660d088eb7
+4e582df (HEAD -> main, origin/styles2, origin/main, origin/develop, origin/HEAD, styles2, develop) HEAD@{3}: rebase: checkout styles2
+1a1ef5f (origin/images2, images2) HEAD@{4}: checkout: moving from styles2 to develop
+4e582df (HEAD -> main, origin/styles2, origin/main, origin/develop, origin/HEAD, styles2, develop) HEAD@{5}: rebase finished: returning to refs/heads/styles2
+4e582df (HEAD -> main, origin/styles2, origin/main, origin/develop, origin/HEAD, styles2, develop) HEAD@{6}: rebase: index.html modified in the styles2 branch
+8a4a1f5 HEAD@{7}: rebase: styles2 dir with css styles was added
+1a1ef5f (origin/images2, images2) HEAD@{8}: rebase: checkout develop
+56c4d63 HEAD@{9}: checkout: moving from develop to styles2
+1a1ef5f (origin/images2, images2) HEAD@{10}: rebase finished: refs/heads/develop onto 1a1ef5fa062fa1ebe47cf7ee6171c93decaf686f
+1a1ef5f (origin/images2, images2) HEAD@{11}: rebase: checkout images2
+c4447cd HEAD@{12}: checkout: moving from images2 to develop
+1a1ef5f (origin/images2, images2) HEAD@{13}: checkout: moving from develop to images2
+c4447cd HEAD@{14}: checkout: moving from styles2 to develop
+56c4d63 HEAD@{15}: commit: index.html modified in the styles2 branch
+b33ae14 HEAD@{16}: commit: styles2 dir with css styles was added
+c4447cd HEAD@{17}: checkout: moving from develop to styles2
+c4447cd HEAD@{18}: checkout: moving from images2 to develop
+1a1ef5f (origin/images2, images2) HEAD@{19}: commit: index.html modified in the images2 branch
+017de5c HEAD@{20}: commit: images2 dir with pictures added
+c4447cd HEAD@{21}: checkout: moving from develop to images2
+c4447cd HEAD@{22}: checkout: moving from main to develop
+c4447cd HEAD@{23}: merge develop: Fast-forward
+b115f39 HEAD@{24}: checkout: moving from develop to main
+c4447cd HEAD@{25}: commit (merge): conflict resolved, merge styles into develop finish
+25f9058 (origin/images, images) HEAD@{26}: merge images: Fast-forward
+e24decb HEAD@{27}: checkout: moving from styles to develop
+e81345a (origin/styles, styles) HEAD@{28}: commit: styles folder added, index.html modified
+e24decb HEAD@{29}: checkout: moving from develop to styles
+e24decb HEAD@{30}: checkout: moving from images to develop
+25f9058 (origin/images, images) HEAD@{31}: commit: index.html modified
+7046775 HEAD@{32}: commit: images added
+e24decb HEAD@{33}: checkout: moving from develop to images
+e24decb HEAD@{34}: commit: index.html added
+b115f39 HEAD@{35}: checkout: moving from main to develop
+b115f39 HEAD@{36}: checkout: moving from develop to main
+b115f39 HEAD@{37}: checkout: moving from main to develop
+b115f39 HEAD@{38}: commit: readme.txt added
+7633d41 HEAD@{39}: checkout: moving from m1-Git to main
+7633d41 HEAD@{40}: checkout: moving from main to m1-Git
+7633d41 HEAD@{41}: clone: from git@gitlab.com:YuriyPelykh/DevOps-22-Pelykh-Yurii.git
