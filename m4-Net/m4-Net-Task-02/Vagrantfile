@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
       vb.memory = 1536
       vb.cpus = 2
       vb.customize ["modifyvm", :id, "--groups", "/m4-Net-Task-05"]
-      vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet3", "net3"]
+      vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet2", "net3"]
     end
 
     conf.vm.provision "file", source: "./dhcp-dns.sh", destination: "/home/vagrant/"
@@ -36,7 +36,7 @@ Vagrant.configure("2") do |config|
       vb.cpus = 1
       vb.customize ["modifyvm", :id, "--groups", "/m4-Net-Task-05"]
       vb.customize ["modifyvm", :id, "--nic2", "bridged","--bridgeadapter2", "Intel(R) Centrino(R) Advanced-N 6205", "--cableconnected2", "on"]
-      vb.customize ["modifyvm", :id, "--nic3", "intnet", "--intnet3", "net3", "--macaddress3", "08:00:27:9b:0d:35" ]
+      vb.customize ["modifyvm", :id, "--nic3", "intnet", "--intnet3", "net3", "--macaddress3", "0800279b0d35" ]
     end
 
     conf.vm.provision "file", source: "./rgw.sh", destination: "/home/vagrant/"
@@ -44,6 +44,51 @@ Vagrant.configure("2") do |config|
     cd /home/vagrant/
     chmod +x rgw.sh
     ./rgw.sh
+    SHELL
+  end
+
+  config.vm.define "R13" do |conf|
+    conf.vm.box = "generic/centos8"
+    conf.vm.hostname = "r13"
+    conf.vm.box_check_update = false
+
+    conf.vm.provider "virtualbox" do |vb|
+      vb.gui = true
+      vb.name = "R13"
+      vb.memory = 1024
+      vb.cpus = 1
+      vb.customize ["modifyvm", :id, "--groups", "/m4-Net-Task-05"]
+      vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet2", "net3", "--macaddress2", "0800279b0d26"]
+      vb.customize ["modifyvm", :id, "--nic3", "intnet", "--intnet3", "net1", "--macaddress3", "0800279b0d27"]
+    end
+
+    conf.vm.provision "file", source: "./r13.sh", destination: "/home/vagrant/"
+    conf.vm.provision "shell", inline: <<-SHELL
+    cd /home/vagrant/
+    chmod +x r13.sh
+    ./r13.sh
+    SHELL
+  end
+
+  config.vm.define "Client1" do |conf|
+    conf.vm.box = "generic/centos8"
+    conf.vm.hostname = "client1"
+    conf.vm.box_check_update = false
+
+    conf.vm.provider "virtualbox" do |vb|
+      vb.gui = true
+      vb.name = "client1"
+      vb.memory = 1024
+      vb.cpus = 1
+      vb.customize ["modifyvm", :id, "--groups", "/m4-Net-Task-05"]
+      vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet2", "net1", "--macaddress2", "0800279b0d25"]
+    end
+
+    conf.vm.provision "file", source: "./client1.sh", destination: "/home/vagrant/"
+    conf.vm.provision "shell", inline: <<-SHELL
+    cd /home/vagrant/
+    chmod +x client1.sh
+    ./client1.sh
     SHELL
   end
 

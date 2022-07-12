@@ -5,7 +5,7 @@ INT1="eth1"
 
 apt_install () {
     apt-get update
-    apt-get install isc-dhcp-server -y
+    apt-get install isc-dhcp-server bind9 bind9utils -y
 }
 
 interfaces_config() {
@@ -61,11 +61,51 @@ dhcp_server_config() {
       hardware ethernet 08:00:27:9b:0d:35;
       fixed-address 172.16.24.254;
      }
+
+     host R13up {
+      hardware ethernet 08:00:27:9b:0d:26;
+      fixed-address 172.16.24.250;
+     }
+}
+
+subnet 172.16.23.0 netmask 255.255.255.0 {
+     range 172.16.23.1 172.16.23.100;
+     option subnet-mask 255.255.255.0;
+     option broadcast-address 172.16.23.255;
+     option domain-name-servers 172.16.24.253;
+     option domain-name \"rocca.local\";
+     option routers 172.16.23.254;
+     default-lease-time 7200;
+     max-lease-time 480000;
+
+     host R13down {
+      hardware ethernet 08:00:27:9b:0d:27;
+      fixed-address 172.16.24.254;
+     }
 }" >> /etc/dhcp/dhcpd.conf
 
     change-config-file "" "INTERFACESv4" "=" "${INT1}" "/etc/default/isc-dhcp-server"
 
     systemctl restart isc-dhcp-server
+}
+
+
+dns_server_config() {
+    cp /etc/bind/named.conf.options{,.bak}
+    echo "listen-on {
+    172.16.24.0/24;
+};
+
+allow-query { any; };
+
+forwarders {
+    8.8.8.8;
+    8.8.4.4;
+};" >> /etc/bind/named.conf.options
+
+    named-checkconf
+    systemctl restart bind9
+
 }
 
 

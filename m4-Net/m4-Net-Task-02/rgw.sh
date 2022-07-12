@@ -53,11 +53,16 @@ interfaces_config() {
 
 #Firewall config:
 firewall_config() {
-    export MAN=eth0
-    export WAN=eth1
+    systemctl stop firewalld
+    systemctl disable firewalld
+    yum install iptables-services
+    systemctl enable iptables
+
+    MAN=eth0
+    WAN=eth1
     #export WAN_IP=85.31.203.127
-    export LAN=eth2
-    export LAN_IP_RANGE=172.16.24.0/24
+    LAN=eth2
+    LAN_IP_RANGE=172.16.24.0/24
 
     #Cleaning all chains and removing rules:
     iptables -F
@@ -141,7 +146,6 @@ routing_config() {
 
 ip4_forwarding_enable
 interfaces_config
-systemctl restart NetworkManager.service
 firewall_config
 routing_config
 
