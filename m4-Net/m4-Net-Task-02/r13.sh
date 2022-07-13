@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+yum_install() {
+    yum makecache --refresh
+    yum install dhcp-relay -y
+    dhcrelay -i eth1 -i eth2 172.16.24.62
+    yum install tcpdump -y
+    yum install dhclient -y
+}
+
+
 #IPv4 forwarding enable:
 ip4_forwarding_enable() {
     echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
@@ -30,35 +39,58 @@ mv $5{.t,}
 interfaces_config() {
     touch /etc/sysconfig/network-scripts/ifcfg-eth1
     echo 'TYPE="Ethernet"
-    BOOTPROTO="dhcp"
-    DEFROUTE="no"
-    IPV4_FAILURE_FATAL="no"
-    NAME="eth1"
-    DEVICE="eth1"
-    ONBOOT="yes"' > /etc/sysconfig/network-scripts/ifcfg-eth1
+      BOOTPROTO="dhcp"
+      DEFROUTE="no"
+      IPV4_FAILURE_FATAL="no"
+      NAME="eth1"
+      DEVICE="eth1"
+      ONBOOT="yes"' > /etc/sysconfig/network-scripts/ifcfg-eth1
 
     touch /etc/sysconfig/network-scripts/ifcfg-eth2
     echo 'TYPE="Ethernet"
-    BOOTPROTO="dhcp"
-    DEFROUTE="no"
-    IPV4_FAILURE_FATAL="no"
-    NAME="eth2"
-    DEVICE="eth2"
-    ONBOOT="yes"' > /etc/sysconfig/network-scripts/ifcfg-eth2
+      BOOTPROTO="dhcp"
+      DEFROUTE="no"
+      IPV4_FAILURE_FATAL="no"
+      NAME="eth2"
+      DEVICE="eth2"
+      ONBOOT="yes"' > /etc/sysconfig/network-scripts/ifcfg-eth2
 
     change-config-file "" "DEFROUTE" "=" "no" "/etc/sysconfig/network-scripts/ifcfg-eth0"
 
     systemctl restart NetworkManager.service
 }
 
+firewalld_disable() {
+    systemctl stop firewalld
+    systemctl disable firewalld
+}
+
+dhclient_config() {
+    cp /etc/dhcp/dhclient.conf{,.bak}
+    echo 'interface "eth1" {
+  send dhcp-client-identifier "net3";
+}
+
+interface "eth2" {
+  send dhcp-client-identifier "net1";
+}' > /etc/dhcp/dhclient.conf
+
+    dhclient -r
+    dhclient -d
+}
 
 routing_config() {
     ip route del default via 10.0.2.2
+    #ip route add default via 172.16.24.1 dev eth1
 }
+
 
 ip4_forwarding_enable
 interfaces_config
+#firewalld_disable
+dhclient_config
 routing_config
+yum_install
 
 exit 0
 

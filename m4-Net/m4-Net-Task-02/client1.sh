@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 yum_install () {
-    yum update
+    yum makecache --refresh
     yum install traceroute -y
+    yum install dhclient -y
 }
 
 
@@ -30,7 +31,7 @@ interfaces_config() {
     touch /etc/sysconfig/network-scripts/ifcfg-eth1
     echo 'TYPE="Ethernet"
     BOOTPROTO="dhcp"
-    DEFROUTE="no"
+    DEFROUTE="yes"
     IPV4_FAILURE_FATAL="no"
     NAME="eth1"
     DEVICE="eth1"

@@ -15,8 +15,8 @@ interfaces_config() {
   renderer: networkd
   ethernets:
     ${INT1}:
-      addresses: [172.16.24.253/24]
-      gateway4: 172.16.24.254
+      addresses: [172.16.24.62/26]
+      gateway4: 172.16.24.1
       nameservers:
         addresses: [127.0.0.1]
         search:
@@ -47,42 +47,61 @@ mv $5{.t,}
 
 
 dhcp_server_config() {
-    echo "subnet 172.16.24.0 netmask 255.255.255.0 {
-     range 172.16.24.1 172.16.24.100;
-     option subnet-mask 255.255.255.0;
-     option broadcast-address 172.16.24.255;
-     option domain-name-servers 172.16.24.253;
-     option domain-name \"rocca.local\";
-     option routers 172.16.24.254;
-     default-lease-time 7200;
-     max-lease-time 480000;
+    cp /etc/dhcp/dhcpd.conf{,.bak}
+    echo 'ddns-update-style none;
+authoritative;
+option domain-name "rocca.local";
+option domain-name-servers 172.16.24.62;
+default-lease-time 600;
+max-lease-time 7200;
 
-     host Rgw {
-      hardware ethernet 08:00:27:9b:0d:35;
-      fixed-address 172.16.24.254;
-     }
 
-     host R13up {
-      hardware ethernet 08:00:27:9b:0d:26;
-      fixed-address 172.16.24.250;
-     }
+class "net1" {
+  match if substring (option dhcp-client-identifier, 0, 4) = "net1";
 }
 
-subnet 172.16.23.0 netmask 255.255.255.0 {
-     range 172.16.23.1 172.16.23.100;
-     option subnet-mask 255.255.255.0;
-     option broadcast-address 172.16.23.255;
-     option domain-name-servers 172.16.24.253;
-     option domain-name \"rocca.local\";
-     option routers 172.16.23.254;
-     default-lease-time 7200;
-     max-lease-time 480000;
+class "net3" {
+  match if substring (option dhcp-client-identifier, 0, 4) = "net3";
+}
 
-     host R13down {
-      hardware ethernet 08:00:27:9b:0d:27;
-      fixed-address 172.16.24.254;
-     }
-}" >> /etc/dhcp/dhcpd.conf
+
+shared-network mynetwork {
+  subnet 172.16.24.0 netmask 255.255.255.192 {
+    option subnet-mask 255.255.255.192;
+    option broadcast-address 172.16.24.63;
+    option routers 172.16.24.1;
+    pool {
+      allow members of "net3";
+      range 172.16.24.2 172.16.24.58;
+    }
+  }
+
+  subnet 172.16.24.96 netmask 255.255.255.248 {
+    pool {
+      allow members of "net1";
+      range 172.16.24.98 172.16.24.102;
+    }
+    option subnet-mask 255.255.255.248;
+    option broadcast-address 172.16.24.103;
+    option routers 172.16.24.97;
+  }
+}
+
+
+host Rgw {
+  hardware ethernet 08:00:27:9b:0d:35;
+  fixed-address 172.16.24.1;
+}
+
+host r13up {
+  hardware ethernet 08:00:27:9b:0d:26;
+  fixed-address 172.16.24.61;
+}
+
+host r13down {
+  hardware ethernet 08:00:27:9b:0d:27;
+  fixed-address 172.16.24.97;
+}' > /etc/dhcp/dhcpd.conf
 
     change-config-file "" "INTERFACESv4" "=" "${INT1}" "/etc/default/isc-dhcp-server"
 
@@ -92,16 +111,24 @@ subnet 172.16.23.0 netmask 255.255.255.0 {
 
 dns_server_config() {
     cp /etc/bind/named.conf.options{,.bak}
-    echo "listen-on {
-    172.16.24.0/24;
-};
+    echo "options {
+        directory "/var/cache/bind";
+        dnssec-validation auto;
 
-allow-query { any; };
+        listen-on-v6 { any; };
 
-forwarders {
-    8.8.8.8;
-    8.8.4.4;
-};" >> /etc/bind/named.conf.options
+        listen-on {
+          172.16.24.0/26;
+          172.16.24.64/27;
+          172.16.24.96/29;
+        };
+
+        allow-query { any; };
+
+        forwarders {
+          8.8.8.8;
+        };
+};" > /etc/bind/named.conf.options
 
     named-checkconf
     systemctl restart bind9
@@ -111,6 +138,7 @@ forwarders {
 
 routing_config() {
     ip route del default via 10.0.2.2
+    ip route add 172.16.24.96/29 via 172.16.24.61
 }
 
 apt_install
