@@ -59,7 +59,7 @@ Vagrant.configure("2") do |config|
       vb.cpus = 1
       vb.customize ["modifyvm", :id, "--groups", "/m4-Net-Task-05"]
       vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet2", "net3", "--macaddress2", "0800279b0d26"]
-      vb.customize ["modifyvm", :id, "--nic3", "intnet", "--intnet3", "net1", "--macaddress3", "0800279b0d27"]
+      vb.customize ["modifyvm", :id, "--nic3", "intnet", "--intnet3", "net1", "--macaddress3", "0808279b0d27"]
     end
 
     conf.vm.provision "file", source: "./r13.sh", destination: "/home/vagrant/"
@@ -67,6 +67,29 @@ Vagrant.configure("2") do |config|
     cd /home/vagrant/
     chmod +x r13.sh
     ./r13.sh
+    SHELL
+  end
+
+  config.vm.define "Rdmz3" do |conf|
+    conf.vm.box = "generic/ubuntu2004"
+    conf.vm.hostname = "rdmz3"
+    conf.vm.box_check_update = false
+
+    conf.vm.provider "virtualbox" do |vb|
+      vb.gui = true
+      vb.name = "Rdmz3"
+      vb.memory = 1024
+      vb.cpus = 1
+      vb.customize ["modifyvm", :id, "--groups", "/m4-Net-Task-05"]
+      vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet2", "net3", "--macaddress2", "0800279b0d24"]
+      vb.customize ["modifyvm", :id, "--nic3", "intnet", "--intnet3", "netdmz", "--macaddress3", "080b279b0d23"]
+    end
+
+    conf.vm.provision "file", source: "./rdmz3.sh", destination: "/home/vagrant/"
+    conf.vm.provision "shell", inline: <<-SHELL
+    cd /home/vagrant/
+    chmod +x rdmz3.sh
+    ./rdmz3.sh
     SHELL
   end
 
@@ -78,10 +101,10 @@ Vagrant.configure("2") do |config|
     conf.vm.provider "virtualbox" do |vb|
       vb.gui = true
       vb.name = "Client1"
-      vb.memory = 1024
+      vb.memory = 512
       vb.cpus = 1
       vb.customize ["modifyvm", :id, "--groups", "/m4-Net-Task-05"]
-      vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet2", "net1", "--macaddress2", "0800279b0d25"]
+      vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet2", "net1", "--macaddress2", "0808279b0d25"]
     end
 
     conf.vm.provision "file", source: "./client1.sh", destination: "/home/vagrant/"
@@ -89,6 +112,28 @@ Vagrant.configure("2") do |config|
     cd /home/vagrant/
     chmod +x client1.sh
     ./client1.sh
+    SHELL
+  end
+
+  config.vm.define "Nginx1" do |conf|
+    conf.vm.box = "generic/ubuntu2004"
+    conf.vm.hostname = "nginx1"
+    conf.vm.box_check_update = false
+
+    conf.vm.provider "virtualbox" do |vb|
+      vb.gui = true
+      vb.name = "Nginx1"
+      vb.memory = 1024
+      vb.cpus = 1
+      vb.customize ["modifyvm", :id, "--groups", "/m4-Net-Task-05"]
+      vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet2", "netdmz", "--macaddress2", "080b279b0d22"]
+    end
+
+    conf.vm.provision "file", source: "./nginx1.sh", destination: "/home/vagrant/"
+    conf.vm.provision "shell", inline: <<-SHELL
+    cd /home/vagrant/
+    chmod +x nginx1.sh
+    ./nginx1.sh
     SHELL
   end
 

@@ -3,7 +3,7 @@
 yum_install () {
     yum makecache --refresh
     yum install traceroute -y
-    yum install dhclient -y
+#    yum install dhclient -y
 }
 
 
@@ -31,24 +31,39 @@ interfaces_config() {
     touch /etc/sysconfig/network-scripts/ifcfg-eth1
     echo 'TYPE="Ethernet"
     BOOTPROTO="dhcp"
-    DEFROUTE="yes"
     IPV4_FAILURE_FATAL="no"
+    DEFROUTE="yes"
     NAME="eth1"
     DEVICE="eth1"
     ONBOOT="yes"' > /etc/sysconfig/network-scripts/ifcfg-eth1
 
+    cp /etc/sysconfig/network-scripts/ifcfg-eth0{,.bak}
     change-config-file "" "DEFROUTE" "=" "no" "/etc/sysconfig/network-scripts/ifcfg-eth0"
+    echo 'PEERDNS=no' >> /etc/sysconfig/network-scripts/ifcfg-eth0
 
     systemctl restart NetworkManager.service
 }
 
 
+dhclient_config() {
+    cp /etc/dhcp/dhclient.conf{,.bak}
+    echo 'interface "eth1" {
+  send dhcp-client-identifier "net1";
+}' > /etc/dhcp/dhclient.conf
+
+    dhclient -r
+    dhclient -d
+}
+
+
 routing_config() {
     ip route del default via 10.0.2.2
+    ip route add 172.16.24.0/26 via 172.16.24.97
 }
 
 yum_install
 interfaces_config
+#dhclient_config
 routing_config
 
 exit 0
