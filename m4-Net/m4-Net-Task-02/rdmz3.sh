@@ -53,7 +53,7 @@ interfaces_config() {
   renderer: networkd
   ethernets:
     eth2:
-      addresses: [172.16.24.65/27]
+      addresses: [172.16.24.249/29]
       gateway4: 172.16.24.1
       nameservers:
         addresses: [172.16.24.62]

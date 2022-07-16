@@ -58,7 +58,7 @@ dhclient_config() {
 
 routing_config() {
     ip route del default via 10.0.2.2
-    ip route add 172.16.24.0/26 via 172.16.24.97
+    #ip route add 172.16.24.0/26 via 172.16.24.97
 }
 
 yum_install

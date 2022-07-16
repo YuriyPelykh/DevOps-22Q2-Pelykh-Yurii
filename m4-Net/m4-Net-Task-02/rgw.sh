@@ -144,6 +144,7 @@ routing_config() {
     ip route del default via 10.0.2.2
     ip route add 172.16.24.96/29 via 172.16.24.61
     ip route add 172.16.24.64/27 via 172.16.24.60
+    ip route add 172.16.24.248/29 via 172.16.24.59
 }
 
 ip4_forwarding_enable
