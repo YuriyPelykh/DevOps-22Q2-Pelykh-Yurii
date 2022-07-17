@@ -29,6 +29,19 @@ mv $5{.t,}
 
 #Network interfaces configuration:
 interfaces_config() {
+    cp /etc/netplan/01-netcfg.yaml{,.bak}
+    echo "network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      dhcp4: true
+      dhcp4-overrides:
+        use-dns: false
+        use-routes: false
+      dhcp6: false
+      optional: true" > /etc/netplan/01-netcfg.yaml
+
     touch /etc/netplan/02-netcfg.yaml
     echo "network:
   version: 2
@@ -39,7 +52,7 @@ interfaces_config() {
       dhcp6: false" > /etc/netplan/02-netcfg.yaml
 
     ip link set eth1 up
-    netplan apply
+    netplan --debug apply
 }
 
 
@@ -152,7 +165,7 @@ nginx_config() {
         <title>Welcome to ${domain}!</title>
     </head>
     <body>
-        <h1>Success!  The ${domain} server block is working!</h1>
+        <h1>Success! The ${domain} server block is working!</h1>
     </body>
 </html>" > /var/www/${domain}/html/index.html
 

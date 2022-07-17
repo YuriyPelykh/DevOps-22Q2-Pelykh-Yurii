@@ -10,6 +10,19 @@ apt_install () {
 
 
 interfaces_config() {
+    cp /etc/netplan/01-netcfg.yaml{,.bak}
+    echo "network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      dhcp4: true
+      dhcp4-overrides:
+        use-dns: false
+        use-routes: false
+      dhcp6: false
+      optional: true" > /etc/netplan/01-netcfg.yaml
+
     touch /etc/netplan/02-netcfg.yaml
     echo "network:
   version: 2
@@ -222,6 +235,13 @@ DNSStubListener=no' > /etc/systemd/resolved.conf
 zone "24.16.172.in-addr.arpa" {
     type master;
     file "master/24.16.172.zone";
+};
+
+zone "roccatech.net" {
+        type master;
+        file "master/roccatech.net";
+        allow-transfer { none; };
+        allow-update { none; };
 };' > /etc/bind/named.conf.local
 
     mkdir /var/cache/bind/master
@@ -235,10 +255,25 @@ rocca.local.    IN      SOA     ns.rocca.local. root.rocca.local. (
         604800          ; Expire
         604800 )        ; Negative Cache TTL
 
-
 @               IN      NS      ns.rocca.local.
 localhost       IN      A       127.0.0.1
 ns              IN      A       172.16.24.62' > /var/cache/bind/master/rocca.local
+
+    touch /var/cache/bind/master/roccatech.net
+    echo'$TTL 14400
+
+@               IN      SOA     roccatech.net. root.roccatech.net. (
+       2022071604      ; Serial
+       10800           ; Refresh
+       3600            ; Retry
+       604800          ; Expire
+       604800 )        ; Negative Cache TTL
+
+                IN      NS      ns.rocca.local.
+localhost       IN      A       127.0.0.1
+roccatech.net.  IN 30s  A       172.16.24.254
+roccatech.net.  IN 30s  A       172.16.24.253
+www             IN      CNAME   roccatech.net.' > /var/cache/bind/master/roccatech.net
 
     touch /var/cache/bind/master/24.16.172.zone
     echo'$TTL    3600
@@ -249,7 +284,9 @@ ns              IN      A       172.16.24.62' > /var/cache/bind/master/rocca.loc
                    3600000         ; Expire
                    3600 )          ; Minimum
    IN      NS      ns.rocca.local.
-62 IN      PTR     ns.rocca.local.' > /var/cache/bind/master/24.16.172.zone
+62 IN      PTR     ns.rocca.local.
+254  IN      PTR     roccatech.net.
+253  IN      PTR     roccatech.net.' > /var/cache/bind/master/24.16.172.zone
 
     named-checkconf
     systemctl restart named

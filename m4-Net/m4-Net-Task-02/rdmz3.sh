@@ -38,6 +38,19 @@ mv $5{.t,}
 
 #Network interfaces configuration:
 interfaces_config() {
+    cp /etc/netplan/01-netcfg.yaml{,.bak}
+    echo "network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      dhcp4: true
+      dhcp4-overrides:
+        use-dns: false
+        use-routes: false
+      dhcp6: false
+      optional: true" > /etc/netplan/01-netcfg.yaml
+
     touch /etc/netplan/02-netcfg.yaml
     echo "network:
   version: 2
@@ -88,9 +101,9 @@ dhcrelay_config() {
 }
 
 
-interfaces_config
 apt_install
 ip4_forwarding_enable
+interfaces_config
 #firewalld_disable
 routing_config
 dhcrelay_config
