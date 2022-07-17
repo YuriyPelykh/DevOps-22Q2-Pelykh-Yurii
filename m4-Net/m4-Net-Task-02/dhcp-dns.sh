@@ -3,9 +3,22 @@
 INT1="eth1"
 
 
+#Packages installation with apt:
 apt_install () {
     apt-get update
     apt-get install isc-dhcp-server bind9 bind9utils -y
+}
+
+
+#Name resolution config:
+resolv_config() {
+    systemctl stop systemd-resolved
+    systemctl disable systemd-resolved
+
+    rm /etc/resolv.conf
+    touch /etc/resolv.conf
+    echo "search rocca.local
+nameserver 172.16.24.62" > /etc/resolv.conf
 }
 
 
@@ -190,15 +203,6 @@ host nginx2 {
 
 
 dns_server_config() {
-    cp /etc/systemd/resolved.conf{,.bak}
-    echo '[Resolve]
-DNS=127.0.0.1
-FallbackDNS=
-DNSSEC=no
-LLMNR=resolve
-DNSStubListener=no' > /etc/systemd/resolved.conf
-
-    systemctl restart systemd-resolved
 
     cp /etc/bind/named.conf.options{,.bak}
     echo 'options {

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+
+#Packages installation with yum:
 yum_install() {
     yum makecache --refresh
     yum install dhcp-relay -y
@@ -15,6 +17,7 @@ ip4_forwarding_enable() {
 }
 
 
+#Function changes value for specified parameter, uncomment it in config file or adds such if it is absent:
 change-config-file() {
 cp $5{,.bak}
 while IFS='' read -r a
@@ -59,23 +62,32 @@ interfaces_config() {
       ONBOOT="yes"' > /etc/sysconfig/network-scripts/ifcfg-eth2
 
     change-config-file "" "DEFROUTE" "=" "no" "/etc/sysconfig/network-scripts/ifcfg-eth0"
+    echo 'PEERDNS=no' >> /etc/sysconfig/network-scripts/ifcfg-eth0
 
     systemctl restart NetworkManager.service
 }
+
 
 firewalld_disable() {
     systemctl stop firewalld
     systemctl disable firewalld
 }
 
+
+#Routing configuration:
 routing_config() {
     ip route del default via 10.0.2.2
-    ip route add default via 172.16.24.1
+    touch /etc/sysconfig/network-scripts/route-eth1
+    echo '172.16.24.64/27 via 172.16.24.60
+172.16.24.248/29 via 172.16.24.59' > /etc/sysconfig/network-scripts/route-eth1
 }
 
+
+#DHCP-relay configuration:
 dhcrelay_config() {
     dhcrelay -m append -c 3 -i eth1 -i eth2 172.16.24.62
 }
+
 
 yum_install
 ip4_forwarding_enable

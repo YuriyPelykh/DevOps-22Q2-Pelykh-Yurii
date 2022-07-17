@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+
+#Packages installation with yum:
 yum_install () {
     yum makecache --refresh
     yum install traceroute -y
@@ -7,6 +9,7 @@ yum_install () {
 }
 
 
+#Function changes value for specified parameter, uncomment it in config file or adds such if it is absent:
 change-config-file() {
 cp $5{,.bak}
 while IFS='' read -r a
