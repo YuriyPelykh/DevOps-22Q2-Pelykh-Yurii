@@ -64,7 +64,7 @@ interfaces_config() {
     change-config-file "" "DEFROUTE" "=" "no" "/etc/sysconfig/network-scripts/ifcfg-eth0"
     echo 'PEERDNS=no' >> /etc/sysconfig/network-scripts/ifcfg-eth0
 
-    systemctl restart NetworkManager.service
+    #systemctl restart NetworkManager.service
 }
 
 
@@ -72,14 +72,29 @@ interfaces_config() {
 routing_config() {
     ip route del default via 10.0.2.2
     touch /etc/sysconfig/network-scripts/route-eth1
-    echo '172.16.24.64/27 via 172.16.24.60
-172.16.24.248/29 via 172.16.24.59' > /etc/sysconfig/network-scripts/route-eth1
+    echo "172.16.24.64/27 via 172.16.24.60
+172.16.24.248/29 via 172.16.24.59" > /etc/sysconfig/network-scripts/route-eth1
+
+    systemctl restart NetworkManager.service
 }
 
 
 #DHCP-relay configuration:
 dhcrelay_config() {
-    dhcrelay -m append -c 3 -i eth1 -i eth2 172.16.24.62
+    sleep 40
+    dhcrelay -m append -c 4 -i eth1 -i eth2 172.16.24.62
+}
+
+
+#Modificate rc.local:
+mod_rclocal() {
+    echo "dhcrelay -m append -c 4 -i eth1 -i eth2 172.16.24.62" >> /etc/rc.d/rc.local
+}
+
+#Firewall disable:
+firewall_config() {
+    systemctl stop firewalld
+    systemctl disable firewalld
 }
 
 
@@ -88,6 +103,8 @@ ip4_forwarding_enable
 interfaces_config
 routing_config
 dhcrelay_config
+firewall_config
+mod_rclocal
 
 exit 0
 

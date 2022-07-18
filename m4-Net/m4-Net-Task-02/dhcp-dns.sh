@@ -48,7 +48,14 @@ interfaces_config() {
       nameservers:
         addresses: [127.0.0.1]
         search:
-        - rocca.local" > /etc/netplan/02-netcfg.yaml
+        - rocca.local
+      routes:
+        - to: 172.16.24.96/29
+          via: 172.16.24.61
+        - to: 172.16.24.64/27
+          via: 172.16.24.60
+        - to: 172.16.24.248/29
+          via: 172.16.24.59" > /etc/netplan/02-netcfg.yaml
 
     ip link set ${INT1} up
     netplan apply
@@ -78,11 +85,30 @@ mv $5{.t,}
 #DHCP-Server configuration:
 dhcp_server_config() {
     cp /etc/dhcp/dhcpd.conf{,.bak}
-    echo 'ddns-update-style none;
+    echo 'ddns-update-style interim;
+ddns-updates on;
+update-static-leases on;
+ddns-domainname "rocca.local";
+ddns-rev-domainname "24.16.172.in-addr.arpa";
+
 authoritative;
 default-lease-time 600;
 max-lease-time 7200;
 
+key "DDNS_UPDATE" {
+  algorithm hmac-md5;
+  secret "3FcSyA9hVM+oKqMqqQlIDA==";
+};
+
+zone rocca.local. {
+  primary 127.0.0.1;
+  key DDNS_UPDATE;
+}
+
+zone 24.16.172.in-addr.arpa. {
+    primary 127.0.0.1;
+    key DDNS_UPDATE;
+}
 
 class "net1" {
   match if substring(hardware, 1, 3) = 08:08:27;
@@ -189,50 +215,51 @@ dns_server_config() {
 
     cp /etc/bind/named.conf.options{,.bak}
     echo 'options {
-        directory "/var/cache/bind";
-        dnssec-validation auto;
+    directory "/var/cache/bind";
+    dnssec-validation auto;
 
-        listen-on {
-          localhost;
-          127.0.0.1;
-          172.16.24.62;
-        };
+    listen-on {
+        localhost;
+        127.0.0.1;
+        172.16.24.62;
+    };
 
-        allow-query { any; };
+    allow-query { any; };
 
-        forwarders {
-          8.8.8.8;
-        };
+    forwarders {
+        8.8.8.8;
+    };
 };' > /etc/bind/named.conf.options
 
     cp /etc/bind/named.conf.local{,.bak}
-    echo'zone "rocca.local" {
-        type master;
-        file "master/rocca.local";
-        allow-transfer { none; };
-        allow-update {
-          172.16.24.0/26;
-          172.16.24.64/27;
-          172.16.24.96/29;
-          172.16.24.248/29;
-        };
+    echo 'key "DDNS_UPDATE" {
+    algorithm hmac-md5;
+    secret "3FcSyA9hVM+oKqMqqQlIDA==";
+};
+
+zone "rocca.local" {
+    type master;
+    file "master/rocca.local";
+    allow-transfer { none; };
+    allow-update { key DDNS_UPDATE; };
 };
 
 zone "24.16.172.in-addr.arpa" {
     type master;
     file "master/24.16.172.zone";
+    allow-update { key DDNS_UPDATE;};
 };
 
 zone "roccatech.net" {
-        type master;
-        file "master/roccatech.net";
-        allow-transfer { none; };
-        allow-update { none; };
+    type master;
+    file "master/roccatech.net";
+    allow-transfer { none; };
+    allow-update { none; };
 };' > /etc/bind/named.conf.local
 
     mkdir /var/cache/bind/master
     touch /var/cache/bind/master/rocca.local
-    echo'$TTL 14400
+    echo "\$TTL 14400
 
 rocca.local.    IN      SOA     ns.rocca.local. root.rocca.local. (
         2022071601      ; Serial
@@ -243,10 +270,10 @@ rocca.local.    IN      SOA     ns.rocca.local. root.rocca.local. (
 
 @               IN      NS      ns.rocca.local.
 localhost       IN      A       127.0.0.1
-ns              IN      A       172.16.24.62' > /var/cache/bind/master/rocca.local
+ns              IN      A       172.16.24.62" > /var/cache/bind/master/rocca.local
 
     touch /var/cache/bind/master/roccatech.net
-    echo'$TTL 14400
+    echo "\$TTL 14400
 
 @               IN      SOA     roccatech.net. root.roccatech.net. (
        2022071604      ; Serial
@@ -259,10 +286,10 @@ ns              IN      A       172.16.24.62' > /var/cache/bind/master/rocca.loc
 localhost       IN      A       127.0.0.1
 roccatech.net.  IN 30s  A       172.16.24.254
 roccatech.net.  IN 30s  A       172.16.24.253
-www             IN      CNAME   roccatech.net.' > /var/cache/bind/master/roccatech.net
+www             IN      CNAME   roccatech.net." > /var/cache/bind/master/roccatech.net
 
     touch /var/cache/bind/master/24.16.172.zone
-    echo'$TTL    3600
+    echo "\$TTL    3600
 @  IN      SOA     rooca.local. root.rocca.local (
                    20060204        ; Serial
                    3600            ; Refresh
@@ -272,8 +299,10 @@ www             IN      CNAME   roccatech.net.' > /var/cache/bind/master/roccate
    IN      NS      ns.rocca.local.
 62 IN      PTR     ns.rocca.local.
 254  IN      PTR     roccatech.net.
-253  IN      PTR     roccatech.net.' > /var/cache/bind/master/24.16.172.zone
+253  IN      PTR     roccatech.net." > /var/cache/bind/master/24.16.172.zone
 
+
+    chown bind.bind -R /var/cache/bind/master
     named-checkconf
     systemctl restart named
     systemctl enable named.service
@@ -283,13 +312,11 @@ www             IN      CNAME   roccatech.net.' > /var/cache/bind/master/roccate
 #Routing configuration:
 routing_config() {
     ip route del default via 10.0.2.2
-    ip route add 172.16.24.96/29 via 172.16.24.61
-    ip route add 172.16.24.64/27 via 172.16.24.60
-    ip route add 172.16.24.248/29 via 172.16.24.59
 }
 
 
 apt_install
+resolv_config
 interfaces_config
 dhcp_server_config
 dns_server_config

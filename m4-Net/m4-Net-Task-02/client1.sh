@@ -65,6 +65,7 @@ routing_config() {
     #ip route add 172.16.24.0/26 via 172.16.24.97
 }
 
+
 yum_install
 interfaces_config
 #dhclient_config

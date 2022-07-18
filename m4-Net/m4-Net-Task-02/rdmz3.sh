@@ -77,7 +77,12 @@ interfaces_config() {
   ethernets:
     eth1:
       dhcp4: true
-      dhcp6: false" > /etc/netplan/02-netcfg.yaml
+      dhcp6: false
+      routes:
+        - to: 172.16.24.96/29
+          via: 172.16.24.61
+        - to: 172.16.24.64/27
+          via: 172.16.24.60" > /etc/netplan/02-netcfg.yaml
 
     touch /etc/netplan/03-netcfg.yaml
     echo "network:
@@ -100,8 +105,6 @@ interfaces_config() {
 
 #Firewall configuration:
 firewall_config() {
-    systemctl stop firewalld
-    systemctl disable firewalld
 
     MAN=eth0
     UPLINK=eth1
@@ -202,10 +205,6 @@ firewall_config() {
 #Routing configuration:
 routing_config() {
     ip route del default via 10.0.2.2
-
-    touch /etc/sysconfig/network-scripts/route-eth1
-    echo '172.16.24.96/29 via 172.16.24.61
-172.16.24.64/27 via 172.16.24.60' > /etc/sysconfig/network-scripts/route-eth1
 }
 
 
@@ -338,7 +337,6 @@ http {
 #}' > /etc/nginx/nginx.conf
 
     systemctl restart nginx
-
 }
 
 
@@ -346,7 +344,7 @@ apt_install
 ip4_forwarding_enable
 resolv_config
 interfaces_config
-firewall_config
+#firewall_config
 routing_config
 dhcrelay_config
 nginx_config
