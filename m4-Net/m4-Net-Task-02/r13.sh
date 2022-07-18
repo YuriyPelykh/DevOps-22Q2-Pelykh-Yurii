@@ -68,12 +68,6 @@ interfaces_config() {
 }
 
 
-firewalld_disable() {
-    systemctl stop firewalld
-    systemctl disable firewalld
-}
-
-
 #Routing configuration:
 routing_config() {
     ip route del default via 10.0.2.2
@@ -92,7 +86,6 @@ dhcrelay_config() {
 yum_install
 ip4_forwarding_enable
 interfaces_config
-#firewalld_disable
 routing_config
 dhcrelay_config
 

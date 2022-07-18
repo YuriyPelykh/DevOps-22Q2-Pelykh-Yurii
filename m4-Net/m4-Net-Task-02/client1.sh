@@ -47,18 +47,19 @@ interfaces_config() {
     systemctl restart NetworkManager.service
 }
 
+#DHCP-client configuration via isc-dhcp-lient:
+#dhclient_config() {
+#    cp /etc/dhcp/dhclient.conf{,.bak}
+#    echo 'interface "eth1" {
+#  send dhcp-client-identifier "net1";
+#}' > /etc/dhcp/dhclient.conf
+#
+#    dhclient -r
+#    dhclient -d
+#}
 
-dhclient_config() {
-    cp /etc/dhcp/dhclient.conf{,.bak}
-    echo 'interface "eth1" {
-  send dhcp-client-identifier "net1";
-}' > /etc/dhcp/dhclient.conf
 
-    dhclient -r
-    dhclient -d
-}
-
-
+#IPv4 routes configuration:
 routing_config() {
     ip route del default via 10.0.2.2
     #ip route add 172.16.24.0/26 via 172.16.24.97

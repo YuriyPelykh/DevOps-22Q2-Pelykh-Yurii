@@ -22,6 +22,7 @@ nameserver 172.16.24.62" > /etc/resolv.conf
 }
 
 
+#IP interfaces configuration:
 interfaces_config() {
     cp /etc/netplan/01-netcfg.yaml{,.bak}
     echo "network:
@@ -74,6 +75,7 @@ mv $5{.t,}
 }
 
 
+#DHCP-Server configuration:
 dhcp_server_config() {
     cp /etc/dhcp/dhcpd.conf{,.bak}
     echo 'ddns-update-style none;
@@ -149,44 +151,24 @@ shared-network mynetwork {
   }
 }
 
-
 host Rgw {
   hardware ethernet 08:00:27:9b:0d:35;
   fixed-address 172.16.24.1;
-#  option domain-name-servers 172.16.24.62;
-#  option domain-name "rocca.local";
-#  option subnet-mask 255.255.255.192;
-#  option broadcast-address 172.16.24.63;
 }
 
 host r13up {
   hardware ethernet 08:00:27:9b:0d:26;
   fixed-address 172.16.24.61;
-#  option domain-name-servers 172.16.24.62;
-#  option domain-name "rocca.local";
-#  option routers 172.16.24.1;
-#  option subnet-mask 255.255.255.192;
-#  option broadcast-address 172.16.24.63;
 }
 
 host rdmz3up {
   hardware ethernet 08:00:27:9b:0d:24;
   fixed-address 172.16.24.59;
-#  option domain-name-servers 172.16.24.62;
-#  option domain-name "rocca.local";
-#  option routers 172.16.24.1;
-#  option subnet-mask 255.255.255.192;
-#  option broadcast-address 172.16.24.63;
 }
 
 host nginx1 {
   hardware ethernet 08:0a:27:9b:0d:22;
   fixed-address 172.16.24.254;
-#  option domain-name-servers 172.16.24.62;
-#  option domain-name "rocca.local";
-#  option routers 172.16.24.249;
-#  option subnet-mask 255.255.255.248;
-#  option broadcast-address 172.16.24.255;
 }
 
 host nginx2 {
@@ -202,6 +184,7 @@ host nginx2 {
 }
 
 
+#DNS-Server configuration:
 dns_server_config() {
 
     cp /etc/bind/named.conf.options{,.bak}
@@ -219,7 +202,6 @@ dns_server_config() {
 
         forwarders {
           8.8.8.8;
-          4.4.2.2;
         };
 };' > /etc/bind/named.conf.options
 
@@ -295,10 +277,10 @@ www             IN      CNAME   roccatech.net.' > /var/cache/bind/master/roccate
     named-checkconf
     systemctl restart named
     systemctl enable named.service
-
 }
 
 
+#Routing configuration:
 routing_config() {
     ip route del default via 10.0.2.2
     ip route add 172.16.24.96/29 via 172.16.24.61

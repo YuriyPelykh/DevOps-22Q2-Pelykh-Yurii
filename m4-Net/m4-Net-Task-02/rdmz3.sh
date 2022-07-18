@@ -8,6 +8,9 @@ apt_install() {
     debconf-set-selections <<< "isc-dhcp-relay isc-dhcp-relay/interfaces string eth1 eth2"
     debconf-set-selections <<< "isc-dhcp-relay isc-dhcp-relay/options string -m append -c 3"
     apt-get install isc-dhcp-relay -y
+    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v4 boolean true"
+    debconf-set-selections <<< "iptables-persistent iptables-persistent/autosave_v6 boolean true"
+    sudo apt-get install iptables-persistent -y
     apt-get install tcpdump -y
     apt-get install nginx -y
 }
@@ -95,9 +98,104 @@ interfaces_config() {
 }
 
 
-firewalld_disable() {
+#Firewall configuration:
+firewall_config() {
     systemctl stop firewalld
     systemctl disable firewalld
+
+    MAN=eth0
+    UPLINK=eth1
+    DOWNLINK=eth2
+
+    #Cleaning all chains and removing rules:
+    iptables -F
+    iptables -F -t nat
+    iptables -F -t mangle
+    iptables -X
+    iptables -t nat -X
+    iptables -t mangle -X
+
+    #Deny all, what is not allowed:
+    iptables -P INPUT DROP
+    iptables -P OUTPUT DROP
+    iptables -P FORWARD DROP
+
+    #Allow localhost and local network:
+    iptables -A INPUT -i lo -j ACCEPT
+    iptables -A OUTPUT -o lo -j ACCEPT
+    iptables -A INPUT -i $DOWNLINK -j ACCEPT
+    iptables -A OUTPUT -o $DOWNLINK -j ACCEPT
+
+    # Allow pings:
+    iptables -A INPUT -p icmp --icmp-type echo-reply -j ACCEPT
+    iptables -A INPUT -p icmp --icmp-type destination-unreachable -j ACCEPT
+    iptables -A INPUT -p icmp --icmp-type time-exceeded -j ACCEPT
+    iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+
+    iptables -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
+    iptables -A OUTPUT -p icmp --icmp-type destination-unreachable -j ACCEPT
+    iptables -A OUTPUT -p icmp --icmp-type time-exceeded -j ACCEPT
+    iptables -A OUTPUT -p icmp --icmp-type echo-request -j ACCEPT
+
+    iptables -A FORWARD -p icmp --icmp-type echo-reply -j ACCEPT
+    iptables -A FORWARD -p icmp --icmp-type destination-unreachable -j ACCEPT
+    iptables -A FORWARD -p icmp --icmp-type time-exceeded -j ACCEPT
+    iptables -A FORWARD -p icmp --icmp-type echo-request -j ACCEPT
+
+    #Open access to the Internet for router:
+    iptables -A OUTPUT -o $UPLINK -j ACCEPT
+
+    #Allow already established connections:
+    iptables -A INPUT -p all -m state --state ESTABLISHED,RELATED -j ACCEPT
+    iptables -A OUTPUT -p all -m state --state ESTABLISHED,RELATED -j ACCEPT
+    iptables -A FORWARD -p all -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+    #Drop unknown packets:
+    iptables -A INPUT -m state --state INVALID -j DROP
+    iptables -A FORWARD -m state --state INVALID -j DROP
+
+    #Drop zero-packets:
+    iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+
+    #Closing from syn-flood attacks:
+    iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+    iptables -A OUTPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+    #Allow dhcp traffic:
+    iptables -A INPUT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+    iptables -A OUTPUT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+    iptables -A FORWARD -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+
+    #Block access from DMZ to local networks:
+    iptables -A INPUT -s 172.16.24.248/29 -d 172.16.24.64/27 -j REJECT
+    iptables -A INPUT -s 172.16.24.248/29 -d 172.16.24.96/29 -j REJECT
+
+    #Forward port into local network:
+   # iptables -t nat -A PREROUTING -p tcp --dport 80 -i $WAN -j DNAT --to 172.16.24.254:80
+   # iptables -A FORWARD -i $WAN -p tcp -m tcp --dport 80 -j ACCEPT
+
+    #Allow access from local net to outside:
+   # iptables -A FORWARD -s 172.16.24.248/29 -d 172.16.24.1 -j ACCEPT
+    #Close access from outside to LAN:
+   # iptables -A FORWARD -i $WAN -o $LAN -j REJECT
+
+    #Open access to SSH:
+    iptables -A INPUT -i $UPLINK -p tcp --dport 22 -j ACCEPT
+    iptables -A INPUT -i $MAN -p tcp --dport 22 -j ACCEPT
+
+    #Open access to Web-server(Nginx-balancer from Internet and directly to Nginx Web-server from LAN):
+    iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+    iptables -A FORWARD -p tcp -m tcp --dport 80 -j ACCEPT
+
+    #Open access to DNS-server:
+    iptables -A INPUT -p udp --dport 53 -j ACCEPT
+    iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+    iptables -A FORWARD -p udp --dport 53 -j ACCEPT
+
+    #Save rules:
+    mkdir /etc/iptables
+    touch /etc/iptables/rules.v4
+    /sbin/iptables-save  > /etc/iptables/rules.v4
 }
 
 
@@ -248,7 +346,7 @@ apt_install
 ip4_forwarding_enable
 resolv_config
 interfaces_config
-#firewalld_disable
+firewall_config
 routing_config
 dhcrelay_config
 nginx_config

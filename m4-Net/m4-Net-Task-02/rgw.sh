@@ -158,6 +158,8 @@ firewall_config() {
     /sbin/iptables-save  > /etc/sysconfig/iptables
 }
 
+
+#Routing configuration:
 routing_config() {
     ip route del default via 10.0.2.2
 

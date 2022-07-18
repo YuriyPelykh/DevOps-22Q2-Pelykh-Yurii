@@ -27,6 +27,7 @@ while IFS='' read -r a
 mv $5{.t,}
 }
 
+
 #Name resolution config:
 resolv_config() {
     systemctl stop systemd-resolved
@@ -77,6 +78,7 @@ firewall_config() {
     ufw status
 }
 
+
 #Nginx configuration:
 nginx_config() {
     systemctl status nginx
@@ -121,6 +123,7 @@ nginx_config() {
     systemctl restart nginx
 
 }
+
 
 #Routes adding:
 routing_config() {
