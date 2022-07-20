@@ -15,5 +15,9 @@
 ### [Module 3 - Linux](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m3-Linux/m3-Linux)  
 - [ ] [Task 1 - Pipes](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m3-Linux-Task-01/m3-Linux/m3-Linux-Task-01)  
 - [ ] [Task 2 - Password quality, user config automation](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m3-Linux-Task-02/m3-Linux/m3-Linux-Task-02)  
-### [Module 4 - Networking]()  
-- [ ] [Task 1 - In Progress...]()
+### [Module 4 - Networking](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m4-Net)    
+- [ ] [Task 1 - HTTP & curl, API GitLab Research](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m4-Net-Task-01/m4-Net/m4-Net-Task-01)
+- [ ] [Task 2 - DHCP, DNS, Routing in LAN, Iptables](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m4-Net-Task-02/m4-Net/m4-Net-Task-02)  
+### [Module 5 - Docker](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m5-Docker)    
+- [ ] [Task 1 - Containers - Docker and docker-compose](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m5-Docker-Task-01/m5-Docker/m5-Docker-Task-01)
+  
