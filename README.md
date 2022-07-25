@@ -20,4 +20,6 @@
 - [ ] [Task 2 - DHCP, DNS, Routing in LAN, Iptables](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m4-Net-Task-02/m4-Net/m4-Net-Task-02)  
 ### [Module 5 - Docker](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m5-Docker)    
 - [ ] [Task 1 - Containers - Docker and docker-compose](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m5-Docker-Task-01/m5-Docker/m5-Docker-Task-01)
+### [Module 6 - Jenkins](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m6-Jenkins)    
+- [ ] [Task 1 - CI/CD](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m6-Jenkins-Task-01/m6-Jenkins/m6-Jenkins-Task-01)
   
