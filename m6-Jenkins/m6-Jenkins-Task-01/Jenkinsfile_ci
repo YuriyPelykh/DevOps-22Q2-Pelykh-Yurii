@@ -1,0 +1,64 @@
+pipeline {
+    environment {
+        TOMCAT_PORT = 8000
+        DOCKER_IMAGE_NAME = "petclinic"
+        DOCKERHUB_REPO = "yuriypelykh"
+        DOCKERHUB_CREDENTIALS=credentials('dockerhub_cred')
+    }
+    agent any
+    stages {
+        stage('Clone repo from main') {
+            steps {
+                git branch: 'main',
+                    credentialsId: 'GitHub_SSH_Key_jenkins',
+                    url: 'git@github.com:YuriyPelykh/spring-petclinic.git'
+                sh "ls -lat"
+            }
+        }
+        stage('Static code analysis') {
+            steps {
+                echo "Stage in development..."
+            }
+        }
+
+        stage('DB creation for Unit-tests') {
+            steps {
+                sh "docker-compose up -d mysql"
+            }
+        }
+
+        stage('Build Docker image') {
+            steps {
+                sh "docker build --tag \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":\"${BUILD_NUMBER}\" \
+                                 --tag \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":latest \
+                                 --build-arg TOMCAT_PORT=${TOMCAT_PORT} \
+                                 --network=\$(echo \"${JOB_NAME}\"_default | tr '[:upper:]' '[:lower:]' | tr -d ' ') \
+                                 --label \"${DOCKER_IMAGE_NAME}\" \
+                                 ."
+            }
+        }
+
+        stage('Push image to registry') {
+            steps {
+                sh "echo \"${DOCKERHUB_CREDENTIALS_PSW}\" | docker login -u \"${DOCKERHUB_CREDENTIALS_USR}\" --password-stdin; \
+                    docker push \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":\"${BUILD_NUMBER}\"; \
+                    docker push \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":latest"
+            }
+        }
+
+        stage('Destroy test-DB') {
+            steps {
+                sh "docker-compose down"
+            }
+        }
+
+        stage('Cleaning') {
+            steps {
+                echo "Removing old images..."
+                sh "docker image prune --all --force --filter \"until=2h\" --filter \"label=\"${DOCKER_IMAGE_NAME}\"\"; \
+                    docker rmi \$(docker images --filter \"dangling=true\" -q)"
+            }
+        }
+    }
+}
+
