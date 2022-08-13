@@ -11,7 +11,8 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh "ssh -v -o StrictHostKeyChecking=no vagrant@172.16.24.2 "mkdir \"${ENVIRONMENT}\"; cd \"${ENVIRONMENT}\"; \
+                sh "ssh -v -o StrictHostKeyChecking=no vagrant@172.16.24.2 \"mkdir ${ENVIRONMENT}; \
+                cd ${ENVIRONMENT}; \
                 echo \'version: \"2.2\"
 
                 services:
@@ -30,7 +31,7 @@ pipeline {
                     ports:
                       - \"8090:8000\"\'> docker-compose.yml; \
                 \
-                docker-compose up -d"
+                docker-compose up -d\""
             }
         }
 
