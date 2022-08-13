@@ -1,73 +1,42 @@
 pipeline {
     environment {
-
+        DEV_PORT = 8090
+        QA_PORT = 8070
         DOCKER_IMAGE_NAME = "petclinic"
         DOCKERHUB_REPO = "yuriypelykh"
-        DOCKERHUB_CREDENTIALS=credentials('dockerhub_cred')
+        APPDB_CREDENTIALS=credentials('dockerhub_cred')
     }
     agent any
     stages {
-        stage('Pull Docker image') {
+
+        stage('Deploy') {
+            steps {
+                sh "ssh -v -o StrictHostKeyChecking=no vagrant@172.16.24.2 "mkdir \"${ENVIRONMENT}\"; cd \"${ENVIRONMENT}\"; \
+                echo \'version: \"2.2\"
+
+                services:
+                  mysql:
+                    image: mysql:5.7
+                    ports:
+                      - \"3306:3306\"
+                    environment:
+                      - MYSQL_ROOT_PASSWORD=
+                      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+                      - MYSQL_USER=petclinic
+                      - MYSQL_PASSWORD=petclinic
+                      - MYSQL_DATABASE=petclinic
+                  app:
+                    image: \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":\"${VERSION}\"
+                    ports:
+                      - \"8090:8000\"\'> docker-compose.yml; \
+                \
+                docker-compose up -d"
+            }
+        }
+
+        stage('Healthcheck') {
             steps {
                 echo "Stage in development..."
-            }
-        }
-
-        stage('Pull app repo') {
-            steps {
-                echo "Stage in development..."
-            }
-        }
-
-        stage('DB creation for env') {
-            steps {
-                sh "docker-compose up -d mysql"
-            }
-        }
-
-        stage('Image deploy') {
-            steps {
-                echo "Stage in development..."
-            }
-        }
-
-        stage('DB creation for Unit-tests') {
-            steps {
-                sh "docker-compose up -d mysql"
-            }
-        }
-
-        stage('Build Docker image') {
-            steps {
-                sh "docker volume create --name maven-repo; \
-                    docker build --tag \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":\"${BUILD_NUMBER}\" \
-                                 --tag \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":latest \
-                                 --build-arg TOMCAT_PORT=${TOMCAT_PORT} \
-                                 --network=\$(echo \"${JOB_NAME}\"_default | tr '[:upper:]' '[:lower:]' | tr -d ' ') \
-                                 --label \"${DOCKER_IMAGE_NAME}\" \
-                                 ."
-            }
-        }
-
-        stage('Push image to registry') {
-            steps {
-                sh "echo \"${DOCKERHUB_CREDENTIALS_PSW}\" | docker login -u \"${DOCKERHUB_CREDENTIALS_USR}\" --password-stdin; \
-                    docker push \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":\"${BUILD_NUMBER}\"; \
-                    docker push \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":latest"
-            }
-        }
-
-        stage('Destroy test-DB') {
-            steps {
-                sh "docker-compose down"
-            }
-        }
-
-        stage('Cleaning') {
-            steps {
-                echo "Removing old images..."
-                sh "docker image prune --all --force --filter \"until=2h\" --filter \"label=\"${DOCKER_IMAGE_NAME}\"\"; \
-                    docker rmi \$(docker images --filter \"dangling=true\" -q)"
             }
         }
     }
