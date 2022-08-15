@@ -26,13 +26,13 @@ pipeline {
             agent {
                 docker {
                     image 'maven:3.8.1-adoptopenjdk-11'
-                    args "-v /var/lib/jenkins/workspace/${JOB_NAME}/:/mnt/ --network=petcliniccipipeline_default"
+                    args "-v \"/var/lib/jenkins/workspace/${JOB_NAME}/\":/mnt/ --network=petcliniccipipeline_default"
                 }
             }
             steps {
                 sh "cd /mnt/; ls -lah"
                 withSonarQubeEnv('Petclinic_Code_Analysis') {
-                    sh 'mvn -f /mnt/pom.xml clean package sonar:sonar -Dsonar.projectKey=Petclinic -Dsonar.working.directory=$WORKSPACE/sonar'
+                    sh 'mvn -f /mnt/pom.xml clean package sonar:sonar -Dsonar.projectKey=Petclinic -Dsonar.working.directory="$WORKSPACE"/sonar'
                 }
             }
         }
