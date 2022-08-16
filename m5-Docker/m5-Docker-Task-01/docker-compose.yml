@@ -1,0 +1,29 @@
+version: '3.3'
+services:
+  db:
+    env_file:
+      - .env
+    build: ./db
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+  app:
+    depends_on:
+      - db
+    env_file:
+      - .env
+    build:
+      context: ./app
+      args:
+        APACHE_PORT: ${APACHE_PORT}
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        DB_SERVER: ${DB_SERVER}
+        DB_USER: ${DB_USER}
+        DB_NAME: ${DB_NAME}
+    ports:
+      - "${EXTERN_PORT}:${APACHE_PORT}"
+    restart: always
+volumes:
+  db_data:
