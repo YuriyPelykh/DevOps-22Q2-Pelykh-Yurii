@@ -15,8 +15,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo "$JENKINS_HOME"
-                load "/var/lib/jenkins/secrets/petcl_db_secrets"
+                load "$JENKINS_HOME/secrets/petcl_db_secrets"
                 sh """echo "version: \\"2.2\\"
 services:
   mysql:
