@@ -1,6 +1,6 @@
 ## Task 1: CI/CD
 
-#### Task details:  
+### Task details:  
 
 Поднять и настроить Jenkins сервер.    
 1. Настройка агентов  
@@ -36,7 +36,7 @@ b. Номер версии (т.е. тег образа, версия или late
 Будет плюсом:  
 + нотификации на почту или в тимз  
  
-## Results:  
+# Results:  
 #### Static and dynamic agents:
 Separate VM was upped (**node1**), SSH-keys on Jenkins were configured for ability to access node1:  
 ![Screen1](./task_images/Screenshot_1.png)  
@@ -84,9 +84,22 @@ Pipeline in progress:
 ![Screen7](./task_images/Screenshot_7.png)  
 
 #### Example of sensitive data in Jenkins Credentials storage:  
-SSH Username and private key for connection to the node:  
-![Screen8](./task_images/Screenshot_8.png)  
+  
+![Screen8](./task_images/Screenshot_8.png)
 
+## I. Multibranch Pipeline Demo:
+
+Settings of multibranch pipeline in Jenkins:  
+
+![Screen9](./task_images/Screenshot_9.png)  
+![Screen10](./task_images/Screenshot_10.png)
+
+**Jenkinsfile** script: [Jenkinsfile](./Jenkinsfile)  
+```commandline
+
+```
+
+### 1. Pipeline is triggered on changes in any branch of git repository, separate pipeline creates for each branch:
 
 
 

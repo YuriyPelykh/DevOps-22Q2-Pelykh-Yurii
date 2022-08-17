@@ -15,7 +15,8 @@ pipeline {
 
         stage('Deploy') {
             steps {
-
+                echo "$JENKINS_HOME"
+                load "/var/lib/jenkins/secrets/petcl_db_secrets"
                 sh """echo "version: \\"2.2\\"
 services:
   mysql:
@@ -23,11 +24,11 @@ services:
     ports:
       - \\"3306:3306\\"
     environment:
-      - MYSQL_ROOT_PASSWORD=
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
-      - MYSQL_USER=petclinic
-      - MYSQL_PASSWORD=petclinic
-      - MYSQL_DATABASE=petclinic
+      - MYSQL_ROOT_PASSWORD=${env.MYSQL_ROOT_PASSWORD}
+      - MYSQL_ALLOW_EMPTY_PASSWORD=${env.MYSQL_ALLOW_EMPTY_PASSWORD}
+      - MYSQL_USER=${env.MYSQL_USER}
+      - MYSQL_PASSWORD=${env.MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${env.MYSQL_DATABASE}
   app:
     image: $DOCKERHUB_REPO/$DOCKER_IMAGE_NAME:$VERSION
     ports:
