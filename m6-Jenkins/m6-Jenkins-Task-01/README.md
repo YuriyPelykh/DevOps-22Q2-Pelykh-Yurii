@@ -214,7 +214,8 @@ pipeline {
 ## Settings
 
 #### General config in Jenkins needed:
-![Screen28](./task_images/Screenshot_28.png)
+![Screen28](./task_images/Screenshot_28.png)  
+
 SonarQube plugin ang it's config:
 ![Screen29](./task_images/Screenshot_29.png)
 ![Screen27](./task_images/Screenshot_27.png)
@@ -334,20 +335,27 @@ pipeline {
 #### Jenkins performs all stages, described in Jenkinsfile_ci:  
 - Clone repo from main branch:
 ![Screen41](./task_images/Screenshot_41.png)
+
 - Creates DB for Unit-tests:
-![Screen42](./task_images/Screenshot_42.png)
+![Screen42](./task_images/Screenshot_42.png)  
+
 - Performs SonarQube Code Analysis:  
 ![Screen40](./task_images/Screenshot_40.png)
-- Got analysis results (Quality Gate):
-- Builds Docker image;
-![Screen43](./task_images/Screenshot_43.png)
+
+- Got analysis results (Quality Gate);  
+- Builds Docker image:
+![Screen43](./task_images/Screenshot_43.png)  
+
 - Pushes image to registry:
 ![Screen44](./task_images/Screenshot_44.png)
 ![Screen45](./task_images/Screenshot_45.png)
+
 - Destroys test-DB:
-![Screen46](./task_images/Screenshot_46.png)
+![Screen46](./task_images/Screenshot_46.png)  
+
 - Clean all unnecessary (old) images from local repo:  
-![Screen47](./task_images/Screenshot_47.png)
+![Screen47](./task_images/Screenshot_47.png)  
+
 - Sends E-mail with pipeline status:  
 ![Screen50](./task_images/Screenshot_50.png)
 
@@ -361,13 +369,15 @@ Pipeline general view:
 ## Settings
 
 #### General config in Jenkins:
-Plugin needed:
+
+Plugin installed:
 ![Screen38](./task_images/Screenshot_38.png)
 
 #### CD Pipeline config in Jenkins:
 
 ![Screen35](./task_images/Screenshot_35.png)
-![Screen36](./task_images/Screenshot_36.png)
+![Screen36](./task_images/Screenshot_36.png)  
+
 Active Choice Parameter script:
 ```commandline
 // Import the JsonSlurper class to parse Dockerhub API response
@@ -478,14 +488,17 @@ services:
 ## Work demo:
 
 #### Pipeline starts manually by launching build with parameters:
+
 Deployed image versions automatically are taking from DokerHub registry: 
 ![Screen49](./task_images/Screenshot_49.png)
 
 #### Jenkins performs stages, described in Jenkinsfile_cd:  
 - Deploy image to specified resource on specified for each environment port:
-![Screen52](./task_images/Screenshot_52.png)
+![Screen52](./task_images/Screenshot_52.png)  
+
 - Performs a healthcheck if application is running successfully:
-![Screen53](./task_images/Screenshot_53.png)
+![Screen53](./task_images/Screenshot_53.png)  
+
 - Sends E-mail with pipeline status:
 ![Screen56](./task_images/Screenshot_56.png)
 
