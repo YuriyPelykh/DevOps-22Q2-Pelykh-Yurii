@@ -48,7 +48,7 @@ services:
                 timeout(time: 3, unit: 'MINUTES')
             }
             steps {
-                sh "while ! curl --silent 192.168.56.1:8090 | grep -q PetClinic; do sleep 5; done"
+                sh "while ! curl --silent $DEPLOY_ADDRESS:`echo \$${ENVIRONMENT}_PORT` | grep -q PetClinic; do sleep 5; done"
                 echo "Service looks healthy!"
             }
         }
