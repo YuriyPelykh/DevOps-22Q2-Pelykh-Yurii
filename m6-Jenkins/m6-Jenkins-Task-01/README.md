@@ -99,11 +99,13 @@ Pipeline's work:
 #### General config in Jenkins:  
 
 GitLab plugins needed be installed:  
-![Screen9](./task_images/Screenshot_9.png)
+![Screen9](./task_images/Screenshot_9.png)  
+
 Jenkins --> Configure System GitLab settings:  
-![Screen10](./task_images/Screenshot_10.png)
+![Screen10](./task_images/Screenshot_10.png)  
+
 Jenkins --> Configure System GitLab Server settings:  
-![Screen11](./task_images/Screenshot_11.png)
+![Screen11](./task_images/Screenshot_11.png)  
 
 #### Multibranch Pipeline configuration:  
 ![Screen12](./task_images/Screenshot_12.png)
