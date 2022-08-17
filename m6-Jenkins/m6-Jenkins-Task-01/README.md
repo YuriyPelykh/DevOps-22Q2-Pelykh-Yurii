@@ -40,7 +40,7 @@ b. Номер версии (т.е. тег образа, версия или late
 
 >Due to impossibility of testing webhooks via mobile phone used as a home router (complicity of port forwarding configuration), such services as GitLab and SonarQube were deployed locally in Docker-containers.
 
-Vagrant config files: 
+Vagrant config files: [vagrant](./vagrant)   
 
 ### Static and dynamic agents:
 Separate VM was upped (**node1**), SSH-keys on Jenkins were configured for ability to access node1:  
@@ -98,7 +98,7 @@ Pipeline's work:
 
 #### General config in Jenkins:  
 
-GitLab plugins needed be installed: 
+GitLab plugins needed be installed:  
 ![Screen9](./task_images/Screenshot_9.png)
 Jenkins --> Configure System GitLab settings:  
 ![Screen10](./task_images/Screenshot_10.png)
@@ -330,25 +330,26 @@ pipeline {
 ![Screen34](./task_images/Screenshot_34.png)
 
 #### Jenkins performs all stages, described in Jenkinsfile_ci:  
-- Clone repo from main branch;
+- Clone repo from main branch:
 ![Screen41](./task_images/Screenshot_41.png)
-- Creates DB for Unit-tests;
+- Creates DB for Unit-tests:
 ![Screen42](./task_images/Screenshot_42.png)
 - Performs SonarQube Code Analysis:  
 ![Screen40](./task_images/Screenshot_40.png)
-- Got analysis results (Quality Gate);
+- Got analysis results (Quality Gate):
 - Builds Docker image;
 ![Screen43](./task_images/Screenshot_43.png)
-- Pushes image to registry;
+- Pushes image to registry:
 ![Screen44](./task_images/Screenshot_44.png)
 ![Screen45](./task_images/Screenshot_45.png)
-- Destroys test-DB;
+- Destroys test-DB:
 ![Screen46](./task_images/Screenshot_46.png)
-- Clean all unnecessary (old) images from local repo;
+- Clean all unnecessary (old) images from local repo:  
 ![Screen47](./task_images/Screenshot_47.png)
-- Sends E-mail with pipeline status:
+- Sends E-mail with pipeline status:  
 ![Screen50](./task_images/Screenshot_50.png)
 
+Pipeline general view:  
 ![Screen39](./task_images/Screenshot_39.png)
 
 
@@ -486,7 +487,7 @@ Deployed image versions automatically are taking from DokerHub registry:
 - Sends E-mail with pipeline status:
 ![Screen56](./task_images/Screenshot_56.png)
 
-Pipeline done:  
+Pipeline general view:    
 ![Screen54](./task_images/Screenshot_54.png)
 
 
