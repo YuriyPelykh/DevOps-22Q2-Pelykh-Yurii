@@ -1,0 +1,90 @@
+pipeline {
+    environment {
+        TOMCAT_PORT = 8000
+        DOCKER_IMAGE_NAME = "petclinic"
+        DOCKERHUB_REPO = "yuriypelykh"
+        DOCKERHUB_CREDENTIALS=credentials('dockerhub_cred')
+    }
+    agent any
+    stages {
+        stage('Clone repo from main') {
+            steps {
+                git branch: 'main',
+                    credentialsId: 'MyGitLab_SSH_Key',
+                    url: 'git@git.my.net:yuriipelykh/spring-petclinic.git'
+                sh "ls -lat"
+            }
+        }
+
+        stage('DB creation for Unit-tests') {
+            steps {
+                sh "docker-compose up -d mysql"
+            }
+        }
+
+        stage("SonarQube Code Analysis") {
+            agent {
+                docker {
+                    image 'maven:3.8.1-adoptopenjdk-11'
+                    args "-v \"/var/lib/jenkins/workspace/${JOB_NAME}/\":/mnt/ --network=petcliniccipipeline_default"
+                }
+            }
+            steps {
+                sh "cd /mnt/; ls -lah"
+                withSonarQubeEnv('Petclinic_Code_Analysis') {
+                    sh 'mvn -f /mnt/pom.xml clean package sonar:sonar -Dsonar.projectKey=Petclinic -Dsonar.working.directory="$WORKSPACE"/sonar'
+                }
+            }
+        }
+
+        stage("Analysis Result (Quality Gate)") {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Build Docker image') {
+            steps {
+                sh "docker build --tag \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":\"${BUILD_NUMBER}\" \
+                                 --tag \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":latest \
+                                 --build-arg TOMCAT_PORT=${TOMCAT_PORT} \
+                                 --network=\$(echo \"${JOB_NAME}\"_default | tr '[:upper:]' '[:lower:]' | tr -d ' ') \
+                                 --label \"${DOCKER_IMAGE_NAME}\" \
+                                 ."
+            }
+        }
+
+        stage('Push image to registry') {
+            steps {
+                sh "echo \"${DOCKERHUB_CREDENTIALS_PSW}\" | docker login -u \"${DOCKERHUB_CREDENTIALS_USR}\" --password-stdin; \
+                    docker push \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":\"${BUILD_NUMBER}\"; \
+                    docker push \"${DOCKERHUB_REPO}\"/\"${DOCKER_IMAGE_NAME}\":latest"
+            }
+        }
+
+        stage('Destroy test-DB') {
+            steps {
+                sh "docker-compose down"
+            }
+        }
+
+        stage('Cleaning') {
+            steps {
+                echo "Removing old images..."
+                sh "docker image prune --all --force --filter \"until=2h\" --filter \"label=\"${DOCKER_IMAGE_NAME}\"\"; \
+                    docker rmi \$(docker images --filter \"dangling=true\" -q)"
+            }
+        }
+    }
+
+    post {
+        always{
+            mail to: "yuriypelykh@gmail.com",
+            subject: "jenkins build:${currentBuild.currentResult}: ${env.JOB_NAME}",
+            body: "${currentBuild.currentResult}: Job ${env.JOB_NAME}\nMore Info can be found here: ${env.BUILD_URL}"
+        }
+    }
+}
+
