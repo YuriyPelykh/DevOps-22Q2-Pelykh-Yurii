@@ -1,0 +1,63 @@
+pipeline {
+    environment {
+        PROJECT_DIR = "petclinic"
+        DEV_PORT = 8090
+        QA_PORT = 8070
+        APP_PORT = 8000
+        DOCKERHUB_REPO = "yuriypelykh"
+        DOCKER_IMAGE_NAME = "petclinic"
+        APPDB_CREDENTIALS=credentials('dockerhub_cred')
+        DEPLOY_ADDRESS = "172.16.24.2"
+        DEPLOY_USER = "vagrant"
+    }
+    agent any
+    stages {
+
+        stage('Deploy') {
+            steps {
+                load "$JENKINS_HOME/secrets/petcl_db_secrets"
+                sh """echo "version: \\"2.2\\"
+services:
+  mysql:
+    image: mysql:5.7
+    ports:
+      - \\"3306:3306\\"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${env.MYSQL_ROOT_PASSWORD}
+      - MYSQL_ALLOW_EMPTY_PASSWORD=${env.MYSQL_ALLOW_EMPTY_PASSWORD}
+      - MYSQL_USER=${env.MYSQL_USER}
+      - MYSQL_PASSWORD=${env.MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${env.MYSQL_DATABASE}
+  app:
+    image: $DOCKERHUB_REPO/$DOCKER_IMAGE_NAME:$VERSION
+    ports:
+      - \\"`echo \$${ENVIRONMENT}_PORT`:$APP_PORT\\" " > docker-compose.yml
+"""
+
+                sh """ssh -v -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_ADDRESS "if [ -d "$PROJECT_DIR/$ENVIRONMENT/$VERSION" ]; then exit 0; else mkdir -p $PROJECT_DIR/$ENVIRONMENT/$VERSION; fi"; \
+                    scp -v -o StrictHostKeyChecking=no docker-compose.yml $DEPLOY_USER@$DEPLOY_ADDRESS:$PROJECT_DIR/$ENVIRONMENT/$VERSION/; \
+                    ssh -v -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_ADDRESS "cd $PROJECT_DIR/$ENVIRONMENT/$VERSION/; \
+                    docker-compose up -d"
+                """
+            }
+        }
+
+        stage('Healthcheck') {
+            options {
+                timeout(time: 3, unit: 'MINUTES')
+            }
+            steps {
+                sh "while ! curl --silent $DEPLOY_ADDRESS:`echo \$${ENVIRONMENT}_PORT` | grep -q PetClinic; do sleep 5; done"
+                echo "Service looks healthy!"
+            }
+        }
+    }
+
+    post {
+        always{
+            mail to: "yuriypelykh@gmail.com",
+            subject: "jenkins build:${currentBuild.currentResult}: ${env.JOB_NAME}",
+            body: "${currentBuild.currentResult}: Job ${env.JOB_NAME}\nMore Info can be found here: ${env.BUILD_URL}"
+        }
+    }
+}
