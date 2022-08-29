@@ -23,6 +23,8 @@ Deploy https://github.com/FaztWeb/php-mysql-crud in GCP:
 
 ![Screen1](./task_images/Screenshot_1.png)  
 ![Screen2](./task_images/Screenshot_2.png)
+
+Result:  
 ![Screen3](./task_images/Screenshot_3.png)
 
 Via gcloud:
@@ -38,6 +40,7 @@ gcloud compute networks subnets create pmc-subnet --project=epam-gcp-study --ran
 ![Screen4](./task_images/Screenshot_4.png)
 ![Screen5](./task_images/Screenshot_5.png)
 
+Or via gcloud:  
 ```commandline
 gcloud compute routers nats create pmc-gw \
     --router=pmc-router \
@@ -65,6 +68,8 @@ User creation:
 
 Table creation:  
 ![Screen31](./task_images/Screenshot_31.png)
+
+Public IP disable:  
 ![Screen32](./task_images/Screenshot_32.png)
 
 ### 6. Create Google Cloud Storage Bucket and upload PHP application:
