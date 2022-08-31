@@ -24,4 +24,6 @@
 - [ ] [Task 1 - CI/CD](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m6-Jenkins-Task-01/m6-Jenkins/m6-Jenkins-Task-01)
 ### [Module 7 - Cloud (GCP)](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m7-Cloud)    
 - [ ] [Task 1 - GCP](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m7-Claud-Task-01/m7-Cloud/m7-Cloud-Task-01)
+### [Module 8 - Terraform](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m8-Terraform)    
+- [ ] [Task 1 - GCP with Terraform](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m8-Terraform-Task-01/m8-Terraform/m8-Terraform-Task-01)
   
