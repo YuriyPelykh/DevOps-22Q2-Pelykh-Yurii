@@ -1,0 +1,6 @@
+---
+# tasks file for dbservers-conf
+
+- include_tasks: mysql_deps_install.yml
+- include_tasks: mysql_config.yml
+- include_tasks: mysql_db_user_create.yml

@@ -1,0 +1,14 @@
+[dbservers]
+192.168.20.2
+
+[webservers]
+192.168.20.3
+192.168.20.4
+
+[webservers:vars]
+db_address = 192.168.20.2
+
+[all:vars]
+db_name = php_mysql_crud
+db_user = dbuser
+db_password = p1ssw0rd

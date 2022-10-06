@@ -1,0 +1,7 @@
+---
+# defaults file for webservers-conf
+
+#db_address: 192.168.20.2
+#db_name: php_mysql_crud
+#db_user: dbuser
+#db_pass: p1ssw0rd

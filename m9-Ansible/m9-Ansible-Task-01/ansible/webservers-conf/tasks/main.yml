@@ -1,0 +1,4 @@
+---
+# tasks file for webservers-conf
+- include_tasks: apache_php_install.yml
+- include_tasks: app_deploy.yml

@@ -1,0 +1,22 @@
+---
+- name: Remove file (delete file)
+  ansible.builtin.file:
+    path: /var/www/html/index.html
+    state: absent
+
+- name: Clone app from GitHub
+  ansible.builtin.git:
+    repo: https://github.com/FaztWeb/php-mysql-crud.git
+    dest: /var/www/html
+    clone: yes
+    update: no
+
+- name: Apply db.php template
+  template:
+    src: templates/db.php.template.j2
+    dest: /var/www/html/db.php
+
+- name: Restart Apache
+  service:
+    name: apache2
+    state: restarted
