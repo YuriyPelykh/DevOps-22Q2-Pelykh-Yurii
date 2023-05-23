@@ -28,4 +28,7 @@
 - [ ] [Task 1 - GCP with Terraform](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m8-Terraform-Task-01/m8-Terraform/m8-Terraform-Task-01)
 ### [Module 9 - Ansible](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m9-Ansible)    
 - [ ] [Task 1 - Configuration Management with Ansible](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m9-Ansible-Task-01/m9-Ansible/m9-Ansible-Task-01)
+### [Module 11 - Swarm](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m11-Swarm)    
+- [ ] [Task 1 - Theoretical part: AWS](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m9-Ansible-Task-01/m9-Ansible/m9-Ansible-Task-01)
+- [ ] [Task 2 - Practical part: PHP+NGINX in Docker, Swarm](https://git.epam.com/yurii_pelykh/DevOps-22Q2-Pelykh-Yurii/-/tree/m9-Ansible-Task-01/m9-Ansible/m9-Ansible-Task-01)
   
