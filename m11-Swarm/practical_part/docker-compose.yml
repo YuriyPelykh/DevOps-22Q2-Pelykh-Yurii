@@ -1,0 +1,65 @@
+version: '3.3'
+services:
+  
+  #Nginx Service
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./app/:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php-fpm
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 350M
+        reservations:
+          cpus: '0.1'
+          memory: 100M
+  
+  #PHP Service
+  php-fpm:
+    # build: ./php-fpm
+    image: yuriypelykh/php8-fpm-mysqli
+    container_name: php-fpm
+    env_file:
+      - .env
+    expose:
+      - 9000
+    volumes:
+      - ./app/:/var/www/html
+    depends_on:
+      - db
+    environment:
+      - DB_SERVER=${DB_SERVER}
+      - DB_USER=${DB_USER}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 350M
+        reservations:
+          cpus: '0.1'
+          memory: 100M
+
+  ## Database service
+  db:
+    image: mysql
+    container_name: database
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+
+#Volumes
+volumes:
+  db_data:
+    driver: local

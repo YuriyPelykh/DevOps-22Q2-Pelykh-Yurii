@@ -1,0 +1,55 @@
+
+Vagrant.configure("2") do |config|
+
+  config.vm.define "SWARM-MANAGER" do |conf|
+    conf.vm.box = "generic/ubuntu2004"
+    #conf.vm.box = "generic/oracle8"
+    conf.vm.hostname = "swarm-manager"
+    conf.vm.box_check_update = false
+
+    conf.vm.provider "virtualbox" do |vb|
+      vb.gui = true
+      vb.name = "SWARM-MANAGER"
+      vb.memory = 1024
+      vb.cpus = 2
+      vb.customize ["modifyvm", :id, "--groups", "/m11-Swarm"]
+      #vb.customize ["modifyvm", :id, "--nic2", "nat"]
+      vb.customize ["modifyvm", :id, "--nic2", "bridged","--bridgeadapter2", "Intel(R) 82579LM Gigabit Network Connection", "--cableconnected2", "on"]
+      #vb.customize ["modifyvm", :id, "--nic2", "bridged","--bridgeadapter2", "Intel(R) Centrino(R) Advanced-N 6205", "--cableconnected2", "on"]
+      #vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet2", "internal-net"]
+    end
+
+    conf.vm.provision "file", source: "./swarm-manager.sh", destination: "/home/vagrant/"
+    conf.vm.provision "shell", inline: <<-SHELL
+    cd /home/vagrant/
+    chmod +x swarm-manager.sh
+    ./swarm-manager.sh
+    SHELL
+  end
+
+  config.vm.define "SWARM-WORKER1" do |conf|
+    conf.vm.box = "generic/ubuntu2004"
+    #conf.vm.box = "generic/oracle8"
+    conf.vm.hostname = "swarm-worker1"
+    conf.vm.box_check_update = false
+
+    conf.vm.provider "virtualbox" do |vb|
+      vb.gui = true
+      vb.name = "SWARM-WORKER1"
+      vb.memory = 1024
+      vb.cpus = 2
+      vb.customize ["modifyvm", :id, "--groups", "/m11-Swarm"]
+      vb.customize ["modifyvm", :id, "--nic2", "bridged","--bridgeadapter2", "Intel(R) 82579LM Gigabit Network Connection", "--cableconnected2", "on"]
+      #vb.customize ["modifyvm", :id, "--nic2", "bridged","--bridgeadapter2", "Intel(R) Centrino(R) Advanced-N 6205", "--cableconnected2", "on"]
+      #vb.customize ["modifyvm", :id, "--nic2", "intnet", "--intnet2", "internal-net"]
+    end
+
+    conf.vm.provision "file", source: "./swarm-worker.sh", destination: "/home/vagrant/"
+    conf.vm.provision "shell", inline: <<-SHELL
+    cd /home/vagrant/
+    chmod +x swarm-worker.sh
+    ./swarm-worker.sh
+    SHELL
+  end
+
+end
