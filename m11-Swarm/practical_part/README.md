@@ -8,7 +8,7 @@ Will be a plus:
 - Configure logging of project logs from containers' stdout.
 
 
-# Task report:  
+# Task report:
 
 ## Files:
 - [ ] Vagrant files for fast VMs creation: [vagrant/](./vagrant/)
@@ -20,9 +20,9 @@ Will be a plus:
 
 ## Part 1: Simple deploy on VM with docker-compose
 
-1. A VM with Docker Engine installed was deployed by vagrant for a testing purposes to just get working configuration for a stack: PHP-Nginx-MySQL.
+1. A VM with Docker Engine installed was deployed via vagrant for a testing purposes to get working configuration for a stack: PHP-Nginx-MySQL.
 
-2. For a testing simple PHP application - Task manager - was taken from here: [https://github.com/FaztWeb/php-mysql-crud](https://github.com/FaztWeb/php-mysql-crud).
+2. Simple PHP application - Task manager - was taken from here for tests: [https://github.com/FaztWeb/php-mysql-crud](https://github.com/FaztWeb/php-mysql-crud).
 
 3. docker-compose.yml contents:
 ```
@@ -109,7 +109,7 @@ RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
 ![Screen1](./images/Screenshot_1.png)
 
-5. Test by opening a Nginx server's address:
+5. And try to open Nginx server's address:
 
 ![Screen2](./images/Screenshot_2.png)
 
