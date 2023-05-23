@@ -1,0 +1,7 @@
+---
+# vars file for webservers-conf
+
+#db_address: 192.168.20.2
+#db_user: dbuser
+#db_password: p1ssw0rd
+#db_name: php_mysql_crud
