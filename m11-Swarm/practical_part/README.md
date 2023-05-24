@@ -135,8 +135,7 @@ RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 Note: `deploy` command doesn't support passing values for environment variables from `.var` file, so something like this was used to do it:
 
 ```
-env $(cat .env | grep ^[A-Z] | xargs) docker stack deploy --with-registry-auth --compose-file docker-compose.yml
- taskmgr
+env $(cat .env | grep ^[A-Z] | xargs) docker stack deploy --with-registry-auth --compose-file docker-compose.yml taskmgr
 ```
 ![Screen8](./images/Screenshot_8.png)
 
@@ -167,6 +166,10 @@ So file will look like:
 
 ![Screen10](./images/Screenshot_10.png)
 
-## Part 4: Logging from container's stdout
 
+# Sources
 
+- [ ] [Dockerize your PHP application with Nginx and PHP8-FPM](https://marc.it/dockerize-application-with-nginx-and-php8/)
+- [ ] [Docker swarm stacks/services resource limits and reservations](https://jmarcos-cano.medium.com/docker-swarm-stacks-resources-limit-f447ee74cb62)
+- [ ] [Setting Memory and CPU Limits In Docker](https://www.baeldung.com/ops/docker-memory-limit)
+- [ ] [Docker Swarm](https://habr.com/ru/articles/659813/)

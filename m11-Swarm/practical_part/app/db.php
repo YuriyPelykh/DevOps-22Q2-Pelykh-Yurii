@@ -8,7 +8,6 @@ $pconn = mysqli_connect(
   $_ENV["MYSQL_ROOT_PASSWORD"]
 ) or die(mysqli_error($mysqli));
 
-
 $create_db = mysqli_query($pconn, "CREATE DATABASE IF NOT EXISTS php_mysql_crud;");
 
 $conn = mysqli_connect(
