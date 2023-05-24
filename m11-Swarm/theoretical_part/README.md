@@ -15,8 +15,6 @@ Will be a plus:
 
 ![diagram](./images/diagram.png)
 
-An example of architecture on AWS:
-
 DNS services with **Amazon Route 53** – Provides DNS services to simplify domain management.
 
 Edge caching with **Amazon CloudFront** – Edge caches high-volume content to decrease the latency to customers.
