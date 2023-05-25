@@ -166,6 +166,142 @@ So file will look like:
 
 ![Screen10](./images/Screenshot_10.png)
 
+## Part 4: Docker containers' logging configuration with ELK Stack
+
+1. `docker-compose.yml` file was supplemented with the configuration of the `gelf` log driver, which will send containers `sdtuot` to the Logstash service:
+
+```
+logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://192.168.0.102:12201"
+        tag: "nginx"
+```
+
+2. Separate container deployment with an ELK stack (Elasticsearch + Logstash + Kibana) added:
+
+```
+## ELK Stack service
+  elk:
+    image: yuriypelykh/elk_yp:v3
+    container_name: elk
+    ports:
+      - "5601:5601"       #kibana
+      - "9200:9200"       #elastic
+      - "5044:5044"       #logstash beats filebeat
+      - "12201:12201/udp" #gelf
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4096M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    command: /opt/logstash/bin/logstash -f /usr/share/logstash/pipeline/ --config.reload.automatic
+```
+
+3. The final appearance of the `docker-compose.yml`:
+
+```
+version: '3.3'
+services:
+  
+  #Nginx Service
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./app/:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php-fpm
+    depends_on:
+      - elk
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 350M
+        reservations:
+          cpus: '0.1'
+          memory: 100M
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://192.168.0.102:12201"
+        tag: "nginx"
+  
+  #PHP Service
+  php-fpm:
+    # build: ./php-fpm
+    image: yuriypelykh/php8-fpm-mysqli
+    container_name: php-fpm
+    env_file:
+      - .env
+    expose:
+      - 9000
+    volumes:
+      - ./app/:/var/www/html
+    depends_on:
+      - db
+    environment:
+      - DB_SERVER=${DB_SERVER}
+      - DB_USER=${DB_USER}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 350M
+        reservations:
+          cpus: '0.1'
+          memory: 100M
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://192.168.0.102:12201"
+        tag: "php-fpm"
+
+  ## Database service
+  db:
+    image: mysql
+    container_name: database
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+  
+  ## ELK Stack service
+  elk:
+    image: yuriypelykh/elk_yp:v3
+    container_name: elk
+    ports:
+      - "5601:5601"       #kibana
+      - "9200:9200"       #elastic
+      - "5044:5044"       #logstash beats filebeat
+      - "12201:12201/udp" #gelf
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4096M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    command: /opt/logstash/bin/logstash -f /usr/share/logstash/pipeline/ --config.reload.automatic
+
+#Volumes
+volumes:
+  db_data:
+    driver: local
+```
+
 
 # Sources
 
