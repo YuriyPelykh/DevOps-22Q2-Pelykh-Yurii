@@ -43,6 +43,9 @@ docker_install() {
     # Exec from vagrant user:
     sudo groupadd docker
     sudo usermod -a -G docker vagrant
+
+    # Set max_map_count (required for successful elk container start):
+    sudo sysctl -w vm.max_map_count=262144
 }
 
 interfaces_config
