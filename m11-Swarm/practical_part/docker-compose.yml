@@ -70,9 +70,11 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
-
+  
+  ## ELK Stack service
   elk:
     image: yuriypelykh/elk_yp:v3
+    container_name: elk
     ports:
       - "5601:5601"       #kibana
       - "9200:9200"       #elastic
