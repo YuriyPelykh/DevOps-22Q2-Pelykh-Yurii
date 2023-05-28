@@ -17,15 +17,15 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 350M
+          cpus: '1'
+          memory: 512M
         reservations:
           cpus: '0.1'
           memory: 100M
     logging:
       driver: gelf
       options:
-        gelf-address: "udp://192.168.0.102:12201"
+        gelf-address: "udp://192.168.0.105:12201"
         tag: "nginx"
   
   #PHP Service
@@ -49,15 +49,15 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 350M
+          cpus: '1'
+          memory: 512M
         reservations:
           cpus: '0.1'
           memory: 100M
     logging:
       driver: gelf
       options:
-        gelf-address: "udp://192.168.0.102:12201"
+        gelf-address: "udp://192.168.0.105:12201"
         tag: "php-fpm"
 
   ## Database service
@@ -73,12 +73,12 @@ services:
   
   ## ELK Stack service
   elk:
-    image: yuriypelykh/elk_yp:v3
+    image: yuriypelykh/elk_yp:v4
     container_name: elk
     ports:
       - "5601:5601"       #kibana
       - "9200:9200"       #elastic
-      - "5044:5044"       #logstash beats filebeat
+      # - "5044:5044"       #logstash beats filebeat
       - "12201:12201/udp" #gelf
     deploy:
       resources:
@@ -88,7 +88,8 @@ services:
         reservations:
           cpus: '0.5'
           memory: 256M
-    command: /opt/logstash/bin/logstash -f /usr/share/logstash/pipeline/ --config.reload.automatic
+      placement:
+        constraints: [node.hostname == swarm-manager]
 
 #Volumes
 volumes:
