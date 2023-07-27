@@ -28,7 +28,6 @@
 - [ ] [Task 1 - GCP with Terraform](https://github.com/YuriyPelykh/DevOps-22Q2-Pelykh-Yurii/tree/main/m8-Terraform/m8-Terraform-Task-01)
 ### [Module 9 - Ansible](https://github.com/YuriyPelykh/DevOps-22Q2-Pelykh-Yurii/tree/main/m9-Ansible)  
 - [ ] [Task 1 - Configuration Management with Ansible](https://github.com/YuriyPelykh/DevOps-22Q2-Pelykh-Yurii/tree/main/m9-Ansible/m9-Ansible-Task-01)
-https://github.com/YuriyPelykh/DevOps-22Q2-Pelykh-Yurii/tree/main/m9-Ansible-Task-01
 ### [Module 10 - Kubernetes](https://github.com/YuriyPelykh/DevOps-22Q2-Pelykh-Yurii/tree/main/m10-Kubernetes)  
 - [ ] [Task 1 - Deploy in K8s cluster with Helm package manager - [Lost]](https://github.com/YuriyPelykh/DevOps-22Q2-Pelykh-Yurii/tree/main/m10-Kubernetes/m10-Kubernetes-Task-01)
 ### [Module 11 - Swarm](https://github.com/YuriyPelykh/DevOps-22Q2-Pelykh-Yurii/tree/main/m11-Swarm)  
